@@ -13,9 +13,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/mrivas/Documents/GitRepos/projects/MVC/'MVC.csproj",
-      "projectName": "'MVC",
-      "projectPath": "/Users/mrivas/Documents/GitRepos/projects/MVC/'MVC.csproj",
+      "projectUniqueName": "/Users/mrivas/Documents/GitRepos/projects/MVC/MVC.csproj",
+      "projectName": "MVC",
+      "projectPath": "/Users/mrivas/Documents/GitRepos/projects/MVC/MVC.csproj",
       "packagesPath": "/Users/mrivas/.nuget/packages/",
       "outputPath": "/Users/mrivas/Documents/GitRepos/projects/MVC/obj/",
       "projectStyle": "PackageReference",
