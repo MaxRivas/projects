@@ -1,8 +1,4 @@
-using System;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Practice.Models;
 
 namespace Practice.Controllers
 {

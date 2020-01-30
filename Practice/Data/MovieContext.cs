@@ -1,16 +1,28 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Practice.Interfaces;
 
-namespace Practice.Contexts
+namespace Practice.Data
 {
+    /// <summary>
+    /// Class that represents the DB movie contet
+    /// </summary>
     public class MovieContext : DbContext
     {
+        /// <summary>
+        /// Default constructor of class
+        /// </summary>
+        /// <param name="options">
+        /// List of options to initialize</param>
+        /// <returns></returns>
         public MovieContext(DbContextOptions<MovieContext> options) : base(options)
         {
 
         }
 
+        /// <summary>
+        /// Gets and sets the list of movies DB set
+        /// </summary>
+        /// <value></value>
         public DbSet <IMovie> Movies {get; set;}
     }
 }
