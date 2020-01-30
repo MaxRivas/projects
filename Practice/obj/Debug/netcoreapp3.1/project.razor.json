@@ -20501,6 +20501,21 @@
   "RootNamespace": "Practice",
   "Documents": [
     {
+      "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/Movies/Edit.cshtml",
+      "TargetPath": "Views/Movies/Edit.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/Movies/Details.cshtml",
+      "TargetPath": "Views/Movies/Details.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/Movies/Create.cshtml",
+      "TargetPath": "Views/Movies/Create.cshtml",
+      "FileKind": "mvc"
+    },
+    {
       "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/_ViewImports.cshtml",
       "TargetPath": "Views/_ViewImports.cshtml",
       "FileKind": "mvc"
@@ -20516,8 +20531,18 @@
       "FileKind": "mvc"
     },
     {
+      "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/Movies/Delete.cshtml",
+      "TargetPath": "Views/Movies/Delete.cshtml",
+      "FileKind": "mvc"
+    },
+    {
       "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/Shared/Error.cshtml",
       "TargetPath": "Views/Shared/Error.cshtml",
+      "FileKind": "mvc"
+    },
+    {
+      "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/Movies/Index.cshtml",
+      "TargetPath": "Views/Movies/Index.cshtml",
       "FileKind": "mvc"
     },
     {
