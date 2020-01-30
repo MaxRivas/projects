@@ -20506,6 +20506,11 @@
       "FileKind": "mvc"
     },
     {
+      "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/HelloWorld/Index.cshtml",
+      "TargetPath": "Views/HelloWorld/Index.cshtml",
+      "FileKind": "mvc"
+    },
+    {
       "FilePath": "/Users/mrivas/Documents/GitRepos/projects/Practice/Views/Home/Privacy.cshtml",
       "TargetPath": "Views/Home/Privacy.cshtml",
       "FileKind": "mvc"

@@ -1,14 +1,23 @@
 using System;
 using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Practice.Models;
 
 namespace Practice.Controllers
 {
-    public class HelloWorldController
+    public class HelloWorldController : Controller
     {
         // GET /HelloWorld
-        public string Index()
+        /*public string Index()
         {
             return "This is my default action...";
+        }*/
+
+        // GET /HelloWord using razor files
+        public IActionResult Index()
+        {
+            return View();
         }
 
         // GET /HelloWorld/Welcome
