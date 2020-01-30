@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Practice.Data;
 using Practice.Models;
+using Practice.Interfaces;
+using System.Collections.Generic;
 
 namespace Practice.Controllers
 {
@@ -20,16 +20,36 @@ namespace Practice.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string searchString, string movieGenre)
         {
-            var movies = from movie in _context.Movies select movie;
+            // Use LINQ to get list of genres.
+            IQueryable<string> genreQuery = from movie in _context.Movies
+                                            orderby movie.Genre
+                                            select movie.Genre;
 
-            if(!string.IsNullOrEmpty(searchString))
+            // IQuerible item is returned
+            var movies = from entry in _context.Movies
+                        select entry;
+            
+            if (!string.IsNullOrEmpty(searchString))
             {
                 movies = movies.Where(item => item.Title.Contains(searchString));
             }
-            
-            return View(await movies.ToListAsync());
+
+            if (!string.IsNullOrEmpty(movieGenre))
+            {
+                movies = movies.Where(item => item.Genre.Equals(movieGenre));
+            }
+
+            var movieFilter = new MovieFilter
+            {
+                Genres = new SelectList(await genreQuery.Distinct().ToListAsync())                
+            };
+
+            // Performing an explicit casting from querible to list
+            movieFilter.Movies = new List<IMovie>(movies);
+
+            return View(movieFilter);
         }
 
         [HttpPost]
