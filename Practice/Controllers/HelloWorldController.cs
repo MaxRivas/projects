@@ -27,15 +27,20 @@ namespace Practice.Controllers
         }*/
 
         // GET /HelloWorld/Welcome/[name]?[multipier] as a query string
-        /*public string Welcome(string name, int multiplier)
+        public IActionResult Welcome(string name, int multiplier = 1)
         {
-            return HtmlEncoder.Default.Encode($"Hello {name}, multiplier is: {multiplier}");
-        }*/
+            ViewData["Message"] = "Hello " + name;
+            ViewData["Multiplier"] = multiplier;
+
+            return View();
+            
+            //return HtmlEncoder.Default.Encode($"Hello {name}, multiplier is: {multiplier}");
+        }
 
         // GET /HelloWord/Welcome/?id?parameter where paremeter is optional
-        public string Welcome(string name, int Id = 1)
+        /*public string Welcome(string name, int Id = 1)
         {
             return HtmlEncoder.Default.Encode($"Hello {name}, your ID  is {Id}");
-        }
+        }*/
     }
 }
