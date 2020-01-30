@@ -16,7 +16,6 @@ namespace Practice.Data
         /// <returns></returns>
         public MovieContext(DbContextOptions<MovieContext> options) : base(options)
         {
-
         }
 
         /// <summary>
