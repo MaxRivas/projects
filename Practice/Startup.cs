@@ -10,12 +10,15 @@ namespace Practice
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
+            Environment  = environment;
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
+
+        public IWebHostEnvironment Environment {get;}
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -23,8 +26,23 @@ namespace Practice
             services.AddControllersWithViews();
 
             // Register the database EF context with the services
+            //services.AddDbContext<MovieContext>(options =>
+            //options.UseSqlite(Configuration.GetConnectionString("MovieContext")));
+
+            // Use SQL lite vs SQL Server depending on build type
             services.AddDbContext<MovieContext>(options =>
-            options.UseSqlite(Configuration.GetConnectionString("MovieContext")));
+            {
+                var connectionString = Configuration.GetConnectionString("MovieContext");
+
+                if (Environment.IsDevelopment())
+                {
+                    options.UseSqlite(connectionString);
+                }
+                else
+                {
+                    options.UseSqlServer(connectionString);
+                }
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -32,7 +50,7 @@ namespace Practice
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();                
             }
             else
             {
