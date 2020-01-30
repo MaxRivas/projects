@@ -10,7 +10,7 @@ namespace Practice
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostEnvironment environment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Environment  = environment;
             Configuration = configuration;

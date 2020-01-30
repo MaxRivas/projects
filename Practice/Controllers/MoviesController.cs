@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Practice.Data;
-using Practice.Interfaces;
+using Practice.Models;
 
 namespace Practice.Controllers
 {

@@ -1,7 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Practice.Interfaces;
 
-namespace Practice.Interfaces
+namespace Practice.Models
 {
     public class Movie : IMovie
     {

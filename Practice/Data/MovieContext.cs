@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Practice.Interfaces;
+using Practice.Models;
 
 namespace Practice.Data
 {
