@@ -18,9 +18,14 @@ namespace Practice.Controllers
         }*/
 
         // GET /HelloWorld/Welcome/[name]?[multipier]
-        public string Welcome(string name, int multiplier)
+        /*public string Welcome(string name, int multiplier)
         {
-            return HtmlEncoder.Default.Encode($"Hello {name}, multipler is: {multiplier}");
+            return HtmlEncoder.Default.Encode($"Hello {name}, multiplier is: {multiplier}");
+        }*/
+
+        public string Welcome(string name, int Id = 1)
+        {
+            return HtmlEncoder.Default.Encode($"Hello {name}, your ID  is {Id}");
         }
     }
 }
