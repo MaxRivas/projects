@@ -17,12 +17,13 @@ namespace Practice.Controllers
             return "This is the Welcome action method...";
         }*/
 
-        // GET /HelloWorld/Welcome/[name]?[multipier]
+        // GET /HelloWorld/Welcome/[name]?[multipier] as a query string
         /*public string Welcome(string name, int multiplier)
         {
             return HtmlEncoder.Default.Encode($"Hello {name}, multiplier is: {multiplier}");
         }*/
 
+        // GET /HelloWord/Welcome/?id?parameter where paremeter is optional
         public string Welcome(string name, int Id = 1)
         {
             return HtmlEncoder.Default.Encode($"Hello {name}, your ID  is {Id}");
