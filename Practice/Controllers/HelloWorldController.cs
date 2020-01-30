@@ -12,10 +12,10 @@ namespace Practice.Controllers
         }
 
         // GET /HelloWorld/Welcome
-        public string Welcome()
+        /*public string Welcome()
         {
             return "This is the Welcome action method...";
-        }
+        }*/
 
         // GET /HelloWorld/Welcome/[name]?[multipier]
         public string Welcome(string name, int multiplier)
