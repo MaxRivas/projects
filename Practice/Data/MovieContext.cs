@@ -22,7 +22,9 @@ namespace Practice.Data
         /// <summary>
         /// Gets and sets the list of movies DB set
         /// </summary>
-        /// <value></value>
-        public DbSet <IMovie> Movies {get; set;}
+        /// <value>
+        /// List of Movies
+        /// </value>
+        public DbSet <Movie> Movies {get; set;}
     }
 }
