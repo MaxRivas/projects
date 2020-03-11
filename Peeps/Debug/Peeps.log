@@ -1,0 +1,12 @@
+﻿  pch.cpp
+  dllmain.cpp
+  Person.cpp
+C:\Users\max.rivas\source\repos\Peeps\Person.h(16,15): warning C4251: 'Person::mFirst': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'Person'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\xstring(4448): message : see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+C:\Users\max.rivas\source\repos\Peeps\Person.h(17,14): warning C4251: 'Person::mLast': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'Person'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\include\xstring(4448): message : see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+C:\Users\max.rivas\source\repos\Peeps\Person.h(19,31): warning C4251: 'Person::mPersonPtr': class 'std::shared_ptr<Person>' needs to have dll-interface to be used by clients of class 'Person'
+C:\Users\max.rivas\source\repos\Peeps\Person.h(19): message : see declaration of 'std::shared_ptr<Person>'
+  Generating Code...
+     Creating library C:\Users\max.rivas\source\repos\GTDLLEXE\Debug\Peeps.lib and object C:\Users\max.rivas\source\repos\GTDLLEXE\Debug\Peeps.exp
+  Peeps.vcxproj -> C:\Users\max.rivas\source\repos\GTDLLEXE\Debug\Peeps.dll
