@@ -1,9 +1,6 @@
 #include <iostream>
 #include "Person.h"
 #include "Employee.h"
-#include "ComplexEmployee.h"
-#include "../Shapes/Triangle.h"
-#include "../Shapes/Triangle.cpp"
 
 int main()
 {
@@ -44,14 +41,11 @@ int main()
 	copyOp = t2;
 	if (copyOp == t2)
 	{
-		cout << "objects are equal after assigned using equal operator" << endl;
+		cout << "objects are equal after assigned using equal operator." << endl;
 	}
 
-	auto constCopy(copyOp);
+	auto constCopy(std::move(copyOp));
 	constCopy.PrintInformation();
-
-	Triangle t(1.0, 1.0, 1.0);
-	t.DisplayDimensions();
 
 	return 0;
 }

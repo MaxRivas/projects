@@ -28,6 +28,7 @@ bool Person::operator ==(const Person& compare) const {
 	auto result = this->mFirst == compare.mFirst;
 	result = result && this->mLast == compare.mLast;
 	result = result && this->mGender == compare.mGender;
+	cout << "EQUAL OPERATOR GOT CALLED" << endl;
 	
 	return result;
 }
@@ -37,6 +38,16 @@ void Person::operator =(const Person& assign){
 	this->mLast = assign.mLast;
 	this->mGender = assign.mGender;
 	this->mPersonPtr = assign.mPersonPtr;
+
+	cout << "COPY CONSTRUCTOR GOT CALLED" << endl;
+}
+
+Person::Person(Person&& other) noexcept {
+	this->mFirst = other.mFirst;
+	this->mLast = other.mLast;
+	this->mGender = other.mGender;
+	this->mPersonPtr = other.mPersonPtr;
+	cout << "MOVE CONSTRUCTOR GOT CALLED" << endl;
 }
 
 Person::~Person() {

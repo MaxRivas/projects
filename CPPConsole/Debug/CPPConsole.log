@@ -1,1 +1,5 @@
-﻿LINK : fatal error LNK1104: cannot open file 'C:\Users\max.rivas\source\repos\CPPConsole\Debug\Shapes.lib'
+﻿  CPPConsole.cpp
+  Employee.cpp
+  Person.cpp
+  Generating Code...
+  CPPConsole.vcxproj -> C:\Users\max.rivas\source\repos\MaxRivas\projects\CPPConsole\Debug\CPPConsole.exe

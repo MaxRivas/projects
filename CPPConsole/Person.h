@@ -16,6 +16,7 @@ public:
 	Person(string first, string last, Gender gender);
 	Person();
 	Person(const Person& other);
+	Person(Person&& other) noexcept;
 	void PrintInformation();
 	bool operator ==(const Person& compare) const;
 	void operator =(const Person& assign);

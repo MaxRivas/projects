@@ -27,9 +27,6 @@
     <ClCompile Include="Employee.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ComplexEmployee.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Person.h">
@@ -40,9 +37,6 @@
     </ClInclude>
     <ClInclude Include="SharedEnums.h">
       <Filter>Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="ComplexEmployee.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -147,21 +147,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ComplexEmployee.cpp" />
     <ClCompile Include="CPPConsole.cpp" />
     <ClCompile Include="Employee.cpp" />
     <ClCompile Include="Person.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ComplexEmployee.h" />
     <ClInclude Include="Employee.h" />
     <ClInclude Include="SharedEnums.h" />
     <ClInclude Include="Person.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Shapes\Shapes.vcxproj">
-      <Project>{a1aee0a4-6354-45c2-898d-b7b09b18ee41}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
