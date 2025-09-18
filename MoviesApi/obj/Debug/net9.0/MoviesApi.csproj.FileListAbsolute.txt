@@ -42,3 +42,16 @@
 /Users/mrivas/Documents/GitRepos/projects/MoviesApi/obj/Debug/net9.0/MoviesApi.pdb
 /Users/mrivas/Documents/GitRepos/projects/MoviesApi/obj/Debug/net9.0/MoviesApi.genruntimeconfig.cache
 /Users/mrivas/Documents/GitRepos/projects/MoviesApi/obj/Debug/net9.0/ref/MoviesApi.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/Namotion.Reflection.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/Newtonsoft.Json.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NJsonSchema.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NJsonSchema.Annotations.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NJsonSchema.NewtonsoftJson.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NJsonSchema.Yaml.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NSwag.Annotations.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NSwag.AspNetCore.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NSwag.Core.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NSwag.Core.Yaml.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NSwag.Generation.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/NSwag.Generation.AspNetCore.dll
+/Users/mrivas/Documents/GitRepos/projects/MoviesApi/bin/Debug/net9.0/YamlDotNet.dll
