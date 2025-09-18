@@ -2,8 +2,10 @@
 .vscode/
 
 # Build artifacts
-[Bb]in/
-[Oo]bj/
+bin/
+Bin/
+obj/
+Obj/
 *.pdb
 *.suo
 *.user
