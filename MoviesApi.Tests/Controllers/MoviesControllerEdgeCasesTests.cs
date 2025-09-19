@@ -10,6 +10,7 @@ using MoviesApi.Dto;
 using Xunit;
 using MoviesApi.Tests.Utilities;
 using static System.Net.HttpStatusCode;
+
 namespace MoviesApi.Tests.Controllers
 {
     /// <summary>
@@ -19,52 +20,45 @@ namespace MoviesApi.Tests.Controllers
     /// </summary>
     public class MoviesControllerEdgeCasesTests : IClassFixture<WebApplicationFactory<MoviesApi.Program>>
     {
-        private readonly WebApplicationFactory<MoviesApi.Program> _factory;
+        #region Private Fields
 
+            private readonly WebApplicationFactory<MoviesApi.Program> _factory;
 
-        private static UpdateMovieDto ValidUpdateMovieDto()
-        {
-            return new UpdateMovieDto
+        #endregion
+
+        #region Constructor
+
+            /// <summary>
+            /// Constructor that sets up a test host with a unique in-memory database for isolation.
+            /// This ensures tests do not interfere with each other's state.
+            /// The database is created fresh for each test class instance.
+            /// The in-memory database name is randomized using a GUID to avoid collisions.
+            /// HTTPS redirection is disabled to reduce log noise during tests.
+            /// The environment is set to Development to keep Swagger/OpenAPI available if needed.
+            /// The database is ensured to be created before any tests run. 
+            /// </summary>
+            /// <param name="factory"></param>
+            public MoviesControllerEdgeCasesTests(WebApplicationFactory<MoviesApi.Program> factory)
             {
-                Id = 9999,
-                Title = Constants.TestMovieTitle,
-                Director = Constants.TestMovieDirector,
-                ReleaseYear = Constants.TestMovieReleaseYear,
-                Genre = Constants.TestMovieGenre
-            };
-        }
-        private static CreateMovieDto ValidCreateMovieDto()
-        {
-            return new CreateMovieDto
-            {
-                Title = Constants.TestMovieTitle,
-                Director = Constants.TestMovieDirector,
-                ReleaseYear = Constants.TestMovieReleaseYear,
-                Genre = Constants.TestMovieGenre
-            };
-        }
-
+                // Use a unique in-memory DB name per test class to isolate state between runs.
+                var uniqueDbName = "EdgeCaseTest_MoviesDb_" + Guid.NewGuid().ToString(Constants.N);
+                _factory = factory.WithWebHostBuilder(builder =>
+                {
+                    builder.UseSetting(Constants.InMemoryDbNameKey, uniqueDbName);
     
-
-        public MoviesControllerEdgeCasesTests(WebApplicationFactory<MoviesApi.Program> factory)
-        {
-            // Use a unique in-memory DB name per test class to isolate state between runs.
-            var uniqueDbName = "EdgeCaseTest_MoviesDb_" + Guid.NewGuid().ToString("N");
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.UseSetting(Constants.InMemoryDbNameKey, uniqueDbName);
-
-                // Disable HTTPS redirect to reduce test log noise
-                builder.UseSetting(Constants.EnableHttpsRedirectKey, "false");
-            });
-
-            // Ensure the in-memory database is created prior to running tests
-            using (var scope = _factory.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<MovieContext>();
-                db.Database.EnsureCreated();
+                    // Disable HTTPS redirect to reduce test log noise
+                    builder.UseSetting(Constants.EnableHttpsRedirectKey, Constants.False);
+                });
+    
+                // Ensure the in-memory database is created prior to running tests
+                using (var scope = _factory.Services.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<MovieContext>();
+                    db.Database.EnsureCreated();
+                }
             }
-        }
+            
+        #endregion
 
         /// <summary>
         /// Sending an invalid movie model (required fields missing or out-of-range) should return BadRequest.
@@ -96,9 +90,9 @@ namespace MoviesApi.Tests.Controllers
         public async Task Update_Nonexistent_ReturnsNotFound()
         {
             var client = _factory.CreateClient();
-            var newMovie = ValidUpdateMovieDto();
+            var newMovie = Helper.ValidUpdateMovieDto();
 
-            var response = await client.PutAsJsonAsync($"/Movies/{newMovie.Id}", newMovie);
+            var response = await client.PutAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{newMovie.Id}", newMovie);
             Assert.Equal(NotFound, response.StatusCode);
         }
 
@@ -111,12 +105,12 @@ namespace MoviesApi.Tests.Controllers
             var client = _factory.CreateClient();
 
             // Create a valid movie first, then attempt an invalid partial update
-            var newMovie = ValidUpdateMovieDto();
+            var newMovie = Helper.ValidUpdateMovieDto();
             var response = await client.PostAsJsonAsync(Constants.SlashMovies, newMovie);
             var created = await response.Content.ReadFromJsonAsync<MovieDto>();
 
             var patch = new PatchMovieDto { ReleaseYear = 1400 };
-            response = await client.PatchAsJsonAsync($"/Movies/{created!.Id}", patch);
+            response = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created!.Id}", patch);
             Assert.Equal(BadRequest, response.StatusCode);
         }
 
@@ -157,7 +151,7 @@ namespace MoviesApi.Tests.Controllers
             var client = _factory.CreateClient();
 
             // Create an initial movie
-            var newMovie = ValidUpdateMovieDto();
+            var newMovie = Helper.ValidUpdateMovieDto();
             var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, newMovie);
             createResp.EnsureSuccessStatusCode();
             var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
@@ -165,10 +159,10 @@ namespace MoviesApi.Tests.Controllers
             // Patch only the Title
             var newTitle = "Updating the Title only";
             var patch = new PatchMovieDto { Title = newTitle };
-            var patchResp = await client.PatchAsJsonAsync($"/Movies/{created!.Id}", patch);
+            var patchResp = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created!.Id}", patch);
             Assert.Equal(NoContent, patchResp.StatusCode);
 
-           var response = await client.GetFromJsonAsync<MovieDto>($"/Movies/{created.Id}");
+           var response = await client.GetFromJsonAsync<MovieDto>($"{Constants.SlashMovies}{Constants.Slash}{created.Id}");
             Assert.Equal(newTitle, response!.Title);
             Assert.Equal(Constants.TestMovieDirector, response.Director); // unchanged
         }
@@ -182,13 +176,13 @@ namespace MoviesApi.Tests.Controllers
             var client = _factory.CreateClient();
 
             // Create an initial movie
-            var newMovie = ValidCreateMovieDto();
+            var newMovie = Helper.ValidCreateMovieDto();
             var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, newMovie);
             createResp.EnsureSuccessStatusCode();
             var response = await createResp.Content.ReadFromJsonAsync<MovieDto>();
 
             var patch = new PatchMovieDto { ReleaseYear = 1700 };
-            var patchResp  = await client.PatchAsJsonAsync($"/Movies/{response!.Id}", patch);
+            var patchResp  = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{response!.Id}", patch);
             Assert.Equal(BadRequest, patchResp.StatusCode);
         }
 
@@ -202,8 +196,8 @@ namespace MoviesApi.Tests.Controllers
             var client = _factory.CreateClient();
 
             // Create an initial movie
-            var newMovie = ValidUpdateMovieDto();
-            var response = await client.PutAsJsonAsync($"/Movies/{newMovie.Id}", newMovie);
+            var newMovie = Helper.ValidUpdateMovieDto();
+            var response = await client.PutAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{newMovie.Id}", newMovie);
 
             Assert.Equal(NotFound, response.StatusCode);
         }
