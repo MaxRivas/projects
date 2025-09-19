@@ -42,8 +42,9 @@ public class MoviesController : ControllerBase
     public async Task<ActionResult<MovieDto>> GetById(int id)
     {
         var movie = await _db.MovieItems.FindAsync(id);
-        if (movie == null) return NotFound();
-        return new MovieDto { Id = movie.Id, Title = movie.Title, Director = movie.Director, ReleaseYear = movie.ReleaseYear, Genre = movie.Genre };
+        return null == movie
+            ? (ActionResult<MovieDto>) NotFound()
+            : (ActionResult<MovieDto>) new MovieDto { Id = movie.Id, Title = movie.Title, Director = movie.Director, ReleaseYear = movie.ReleaseYear, Genre = movie.Genre };
     }
 
     /// <summary>
@@ -54,12 +55,17 @@ public class MoviesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<MovieDto>> Create([FromBody] CreateMovieDto create)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        var movie = new Movie { Title = create.Title, Director = create.Director, ReleaseYear = create.ReleaseYear, Genre = create.Genre };
-        _db.MovieItems.Add(movie);
-        await _db.SaveChangesAsync();
-        var dto = new MovieDto { Id = movie.Id, Title = movie.Title, Director = movie.Director, ReleaseYear = movie.ReleaseYear, Genre = movie.Genre };
-        return CreatedAtAction(nameof(GetById), new { id = movie.Id }, dto);
+        if (ModelState.IsValid)
+        {
+            var movie = new Movie { Title = create.Title, Director = create.Director, ReleaseYear = create.ReleaseYear, Genre = create.Genre };
+            _db.MovieItems.Add(movie);
+            await _db.SaveChangesAsync();
+
+            var dto = new MovieDto { Id = movie.Id, Title = movie.Title, Director = movie.Director, ReleaseYear = movie.ReleaseYear, Genre = movie.Genre };
+            return CreatedAtAction(nameof(GetById), new { id = movie.Id }, dto);
+        }
+
+        return BadRequest(ModelState);
     }
 
     /// <summary>
@@ -71,18 +77,29 @@ public class MoviesController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateMovieDto update)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        if (id != update.Id) return BadRequest();
-        var existing = await _db.MovieItems.FindAsync(id);
-        if (existing == null) return NotFound();
+        if (ModelState.IsValid)
+        {
+            if (id == update.Id)
+            {
+                var existing = await _db.MovieItems.FindAsync(id);
+                if (null != existing)
+                {
+                    existing.Title = update.Title;
+                    existing.Director = update.Director;
+                    existing.ReleaseYear = update.ReleaseYear;
+                    existing.Genre = update.Genre;
 
-        existing.Title = update.Title;
-        existing.Director = update.Director;
-        existing.ReleaseYear = update.ReleaseYear;
-        existing.Genre = update.Genre;
+                    await _db.SaveChangesAsync();
+                    return NoContent();
+                }
 
-        await _db.SaveChangesAsync();
-        return NoContent();
+                return NotFound();
+            }
+
+            return BadRequest();
+        }
+
+        return BadRequest(ModelState);
     }
 
     /// <summary>
@@ -93,8 +110,8 @@ public class MoviesController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var movie = await _db.MovieItems.FindAsync(id);
-        if (movie == null) return NotFound();
+    var movie = await _db.MovieItems.FindAsync(id);
+    if (null == movie) return NotFound();
         _db.MovieItems.Remove(movie);
         await _db.SaveChangesAsync();
         return NoContent();
