@@ -120,4 +120,35 @@ public class MoviesController : ControllerBase
 
         return NotFound();
     }
+
+    /// <summary>
+    /// Partially updates a movie by applying non-null values from <see cref="PatchMovieDto"/>.
+    /// </summary>
+    /// <param name="id">The id of the movie to patch.</param>
+    /// <param name="patch">The patch DTO with optional fields.</param>
+    /// <returns>NoContent on success, NotFound if missing, or BadRequest for invalid input.</returns>
+    [HttpPatch("{id:int}")]
+    public async Task<IActionResult> Patch(int id, [FromBody] PatchMovieDto patch)
+    {
+        if (patch == null) return BadRequest();
+
+        var existing = await _db.MovieItems.FindAsync(id);
+        if (existing == null) return NotFound();
+
+        // Apply fields only when present
+        if (patch.Title != null) existing.Title = patch.Title;
+        if (patch.Director != null) existing.Director = patch.Director;
+        if (patch.ReleaseYear.HasValue) existing.ReleaseYear = patch.ReleaseYear.Value;
+        if (patch.Genre != null) existing.Genre = patch.Genre;
+
+        // Validate ReleaseYear range manually if provided
+        if (patch.ReleaseYear.HasValue && (patch.ReleaseYear < 1888 || patch.ReleaseYear > 2100))
+        {
+            ModelState.AddModelError(nameof(patch.ReleaseYear), "ReleaseYear must be between 1888 and 2100.");
+            return BadRequest(ModelState);
+        }
+
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
 }
