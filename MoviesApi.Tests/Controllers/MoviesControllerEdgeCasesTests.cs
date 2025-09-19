@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MoviesApi.Dto;
 using Xunit;
 
-namespace MoviesApi.Tests;
+namespace MoviesApi.Tests.Controllers;
 
 public class MoviesControllerEdgeCasesTests : IClassFixture<WebApplicationFactory<MoviesApi.Program>>
 {

@@ -9,7 +9,7 @@ using MoviesApi.Models;
 using MoviesApi.Dto;
 using Xunit;
 
-namespace MoviesApi.Tests;
+namespace MoviesApi.Tests.Controllers;
 
 public class MoviesControllerIntegrationTests
     : IClassFixture<WebApplicationFactory<MoviesApi.Program>>
@@ -42,24 +42,24 @@ public class MoviesControllerIntegrationTests
     {
         var client = _factory.CreateClient();
 
-    // Create
-    var create = new CreateMovieDto { Title = "New Movie", Director = "Director", ReleaseYear = 2024, Genre = "Drama" };
-    var createResp = await client.PostAsJsonAsync("/Movies", create);
-    Assert.Equal(System.Net.HttpStatusCode.Created, createResp.StatusCode);
+        // Create
+        var create = new CreateMovieDto { Title = "New Movie", Director = "Director", ReleaseYear = 2024, Genre = "Drama" };
+        var createResp = await client.PostAsJsonAsync("/Movies", create);
+        Assert.Equal(System.Net.HttpStatusCode.Created, createResp.StatusCode);
 
-    var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
-    Assert.NotNull(created);
-    Assert.True(created!.Id > 0);
+        var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
+        Assert.NotNull(created);
+        Assert.True(created!.Id > 0);
 
         // Read - first list all movies to see what's present
         var list = await client.GetFromJsonAsync<MovieDto[]>("/Movies");
         Assert.NotNull(list);
         Assert.Contains(list!, m => m.Id == created.Id);
 
-    var getResp = await client.GetAsync($"/Movies/{created!.Id}");
-    Assert.Equal(System.Net.HttpStatusCode.OK, getResp.StatusCode);
-    var got = await getResp.Content.ReadFromJsonAsync<MovieDto>();
-    Assert.Equal("New Movie", got!.Title);
+        var getResp = await client.GetAsync($"/Movies/{created!.Id}");
+        Assert.Equal(System.Net.HttpStatusCode.OK, getResp.StatusCode);
+        var got = await getResp.Content.ReadFromJsonAsync<MovieDto>();
+        Assert.Equal("New Movie", got!.Title);
 
         // Update
         var update = new UpdateMovieDto { Id = created.Id, Title = "Updated Movie", Director = "Director", ReleaseYear = 2025, Genre = "Drama" };
