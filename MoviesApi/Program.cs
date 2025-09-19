@@ -3,7 +3,7 @@ using MoviesApi.Models;
 
 namespace MoviesApi
 {
-    public class Program
+    public partial class Program
     {
         public static void Main(string[] args)
         {
@@ -38,6 +38,8 @@ namespace MoviesApi
             app.MapControllers();
 
             app.Run();
+
+            // Allow WebApplicationFactory to reference Program from integration tests
         }
     }
 }

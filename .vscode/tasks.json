@@ -2,6 +2,20 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "build MoviesApi",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/MoviesApi/MoviesApi.csproj"
+			],
+			"problemMatcher": ["$msCompile"],
+			"group": "build",
+			"presentation": {
+				"reveal": "always"
+			}
+		},
+		{
 			"type": "docker-build",
 			"label": "docker-build",
 			"platform": "node",

@@ -1,11 +1,48 @@
 {
-    "configurations": [
-        {
-            "name": "Containers: Node.js Launch",
-            "type": "docker",
-            "request": "launch",
-            "preLaunchTask": "docker-run: debug",
-            "platform": "node"
-        }
-    ]
+  // VS Code launch configurations for MoviesApi
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch MoviesApi (Kestrel)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build MoviesApi",
+      "program": "${workspaceFolder}/MoviesApi/bin/Debug/net9.0/MoviesApi.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/MoviesApi",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "Attach to MoviesApi (process)",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    }
+    ,
+    {
+      "name": "Launch MoviesApi (with launch-profile)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build MoviesApi",
+      // Run with the same args as: dotnet run --project MoviesApi/MoviesApi.csproj --launch-profile "Development"
+      "program": "${command:dotnetExecutable}",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/MoviesApi/MoviesApi.csproj",
+        "--launch-profile",
+        "Development"
+      ],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
 }
