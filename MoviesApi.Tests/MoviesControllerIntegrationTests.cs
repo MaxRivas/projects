@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MoviesApi.Models;
-using MoviesApi.Models.Dto;
+using MoviesApi.Dto;
 using Xunit;
 
 namespace MoviesApi.Tests;

@@ -41,12 +41,8 @@ namespace MoviesApi
             }
 
             app.UseAuthorization();
-
             app.MapControllers();
-
             app.Run();
-
-            // Allow WebApplicationFactory to reference Program from integration tests
         }
     }
 }

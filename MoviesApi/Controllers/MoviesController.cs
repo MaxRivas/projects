@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoviesApi.Models;
-using MoviesApi.Models.Dto;
+using MoviesApi.Dto;
 
 namespace MoviesApi.Controllers;
 
@@ -110,10 +110,14 @@ public class MoviesController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-    var movie = await _db.MovieItems.FindAsync(id);
-    if (null == movie) return NotFound();
-        _db.MovieItems.Remove(movie);
-        await _db.SaveChangesAsync();
-        return NoContent();
+        var movie = await _db.MovieItems.FindAsync(id);
+        if (null != movie)
+        {
+            _db.MovieItems.Remove(movie);
+            await _db.SaveChangesAsync();
+            return NoContent();
+        }
+
+        return NotFound();
     }
 }

@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using MoviesApi.Models.Dto;
+using MoviesApi.Dto;
 using Xunit;
 
 namespace MoviesApi.Tests;

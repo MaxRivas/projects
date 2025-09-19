@@ -10,9 +10,9 @@ namespace MoviesApi.Models
         /// </summary>
         public Movie()
         {
-            this.Title = string.Empty;
-            this.Director = string.Empty;
-            this.Genre = string.Empty;
+            Title = string.Empty;
+            Director = string.Empty;
+            Genre = string.Empty;
         }
 
         /// <summary>
