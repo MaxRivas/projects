@@ -4,6 +4,9 @@ namespace MoviesApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+/// <summary>
+/// Example weather forecast controller provided by the template. Returns a small list of forecasts.
+/// </summary>
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -13,11 +16,19 @@ public class WeatherForecastController : ControllerBase
 
     private readonly ILogger<WeatherForecastController> _logger;
 
+    /// <summary>
+    /// Creates a new instance of <see cref="WeatherForecastController"/>.
+    /// </summary>
+    /// <param name="logger">Logger instance.</param>
     public WeatherForecastController(ILogger<WeatherForecastController> logger)
     {
         _logger = logger;
     }
 
+    /// <summary>
+    /// Returns a short list of sample <see cref="WeatherForecast"/> items.
+    /// </summary>
+    /// <returns>Array of <see cref="WeatherForecast"/>.</returns>
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
