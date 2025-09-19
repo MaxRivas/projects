@@ -47,7 +47,7 @@ public class MoviesControllerEdgeCasesTests : IClassFixture<WebApplicationFactor
         var client = _factory.CreateClient();
 
         // Create payload intentionally invalid: empty strings and too-small ReleaseYear
-        var create = new CreateMovieDto { Title = "", Director = "", ReleaseYear = 1800, Genre = "" };
+    var create = new CreateMovieDto { Title = string.Empty, Director = string.Empty, ReleaseYear = 1800, Genre = string.Empty };
         var resp = await client.PostAsJsonAsync("/Movies", create);
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, resp.StatusCode);
     }
@@ -75,7 +75,7 @@ public class MoviesControllerEdgeCasesTests : IClassFixture<WebApplicationFactor
         var client = _factory.CreateClient();
 
         // Create a valid movie first, then attempt an invalid partial update
-        var create = new CreateMovieDto { Title = "Patch Test", Director = "Dir", ReleaseYear = 2020, Genre = "Drama" };
+    var create = new CreateMovieDto { Title = "Patch Test", Director = "Dir", ReleaseYear = 2020, Genre = "Drama" };
         var createResp = await client.PostAsJsonAsync("/Movies", create);
         var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
 
@@ -184,7 +184,7 @@ public class MoviesControllerEdgeCasesTests : IClassFixture<WebApplicationFactor
         var client = _factory.CreateClient();
 
         // Create payload intentionally invalid: empty strings and too-small ReleaseYear
-        var create = new CreateMovieDto { Title = "", Director = "", ReleaseYear = 1800, Genre = "" };
+    var create = new CreateMovieDto { Title = string.Empty, Director = string.Empty, ReleaseYear = 1800, Genre = string.Empty };
         var resp = await client.PostAsJsonAsync("/Movies", create);
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, resp.StatusCode);
     }
@@ -288,7 +288,7 @@ public class MoviesControllerEdgeCasesTests : IClassFixture<WebApplicationFactor
         var client = _factory.CreateClient();
 
         // Missing required Title
-        var create = new CreateMovieDto { Title = "", Director = "Director", ReleaseYear = 2000, Genre = "Drama" };
+    var create = new CreateMovieDto { Title = string.Empty, Director = "Director", ReleaseYear = 2000, Genre = "Drama" };
         var resp = await client.PostAsJsonAsync("/Movies", create);
 
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, resp.StatusCode);
