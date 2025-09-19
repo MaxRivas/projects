@@ -3,13 +3,22 @@ namespace MoviesApi.Tests.Utilities;
 /// <summary>
 /// Test project constants. Kept separate so tests can reference values without depending on the main project internals.
 /// </summary>
-public static class Constants
+internal static class Constants
 {
-    public const string InMemoryDbNameKey = "InMemoryDbName";
-    public const string EnableHttpsRedirectKey = "EnableHttpsRedirect";
+    internal const string InMemoryDbNameKey = "InMemoryDbName";
+    internal const string EnableHttpsRedirectKey = "EnableHttpsRedirect";
 
-    public const int ReleaseYearMin = 1888;
-    public const int ReleaseYearMax = 9999;
+    internal const int ReleaseYearMin = 1888;
+    internal const int ReleaseYearMax = 9999;
 
-    public const string TestDbPrefix = "Test_MoviesDb_";
+    internal const string TestDbPrefix = "Test_MoviesDb_";
+
+    internal const string SlashMovies = "/Movies";
+
+    internal const string TestMovieTitle = "Test Movie Title";
+
+    internal const string TestMovieDirector = "Test Movie Director";
+    internal const int TestMovieReleaseYear = 2000;
+
+    internal const string TestMovieGenre = "Test Movie Genre";
 }
