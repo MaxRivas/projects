@@ -11,6 +11,10 @@ using Xunit;
 
 namespace MoviesApi.Tests.Controllers;
 
+/// <summary>
+/// Integration tests for <see cref="MoviesApi.Controllers.MoviesController"/> using WebApplicationFactory.
+/// These tests exercise the HTTP endpoints end-to-end against the in-memory EF Core provider.
+/// </summary>
 public class MoviesControllerIntegrationTests
     : IClassFixture<WebApplicationFactory<MoviesApi.Program>>
 {
@@ -37,12 +41,16 @@ public class MoviesControllerIntegrationTests
         }
     }
 
+    /// <summary>
+    /// Full CRUD flow smoke test: Create -> List -> Get -> Update -> Delete.
+    /// Ensures endpoints return expected status codes and persisted values.
+    /// </summary>
     [Fact]
     public async Task CrudFlow_Works()
     {
         var client = _factory.CreateClient();
 
-        // Create
+    // Create a new movie via POST
         var create = new CreateMovieDto { Title = "New Movie", Director = "Director", ReleaseYear = 2024, Genre = "Drama" };
         var createResp = await client.PostAsJsonAsync("/Movies", create);
         Assert.Equal(System.Net.HttpStatusCode.Created, createResp.StatusCode);
@@ -51,7 +59,7 @@ public class MoviesControllerIntegrationTests
         Assert.NotNull(created);
         Assert.True(created!.Id > 0);
 
-        // Read - first list all movies to see what's present
+    // Read - list all movies and verify created item is present
         var list = await client.GetFromJsonAsync<MovieDto[]>("/Movies");
         Assert.NotNull(list);
         Assert.Contains(list!, m => m.Id == created.Id);
@@ -61,7 +69,7 @@ public class MoviesControllerIntegrationTests
         var got = await getResp.Content.ReadFromJsonAsync<MovieDto>();
         Assert.Equal("New Movie", got!.Title);
 
-        // Update
+    // Update the movie via PUT and verify change persisted
         var update = new UpdateMovieDto { Id = created.Id, Title = "Updated Movie", Director = "Director", ReleaseYear = 2025, Genre = "Drama" };
         var updateResp = await client.PutAsJsonAsync($"/Movies/{created.Id}", update);
         Assert.Equal(System.Net.HttpStatusCode.NoContent, updateResp.StatusCode);
@@ -69,7 +77,7 @@ public class MoviesControllerIntegrationTests
         var getAfterUpdate = await client.GetFromJsonAsync<MovieDto>($"/Movies/{created.Id}");
         Assert.Equal("Updated Movie", getAfterUpdate!.Title);
 
-        // Delete
+    // Delete the movie and verify it's removed
         var deleteResp = await client.DeleteAsync($"/Movies/{created.Id}");
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResp.StatusCode);
 
