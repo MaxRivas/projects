@@ -70,4 +70,7 @@ export default defineConfig([
     },
   },
 ])
-```
+
+To run the application:
+  cd MoviesApp
+  npm run dev
