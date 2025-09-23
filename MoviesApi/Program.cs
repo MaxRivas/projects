@@ -10,7 +10,7 @@ namespace MoviesApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllers();
+            builder.Services.AddControllersWithViews();
 
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
@@ -24,6 +24,9 @@ namespace MoviesApi
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+
                 app.MapOpenApi();
 
                 // Enable swagger UI
@@ -40,8 +43,31 @@ namespace MoviesApi
                 app.UseHttpsRedirection();
             }
 
-            app.UseAuthorization();
-            app.MapControllers();
+            app.MapStaticAssets();
+
+            // This middleware is crucial for serving the React client application.
+            app.MapWhen(ctx => ctx.Request.Path.StartsWithSegments("/api"), api =>
+            {
+                api.UseRouting();
+                api.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
+            });
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                if (app.Environment.IsDevelopment())
+                {
+                    // Proxy requests to the Vite development server.
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:5173"); 
+                }
+            });
+
+            app.MapFallbackToFile("index.html");
+
             app.Run();
         }
     }
