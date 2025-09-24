@@ -12,13 +12,22 @@ namespace MoviesApi.Controllers
     /// </summary>
     public class MoviesController : ControllerBase
     {
+        #region Private Fields
         private readonly MovieContext _db;
+
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Creates a new instance of <see cref="MoviesController"/>.
         /// </summary>
         /// <param name="db">The <see cref="MovieContext"/> used for data access.</param>
         public MoviesController(MovieContext db) => _db = db;
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Returns all movies.
@@ -43,12 +52,33 @@ namespace MoviesApi.Controllers
         {
             var movie = await _db.MovieItems.FindAsync(id);
             return null == movie
-                ? (ActionResult<MovieDto>) NotFound()
-                : (ActionResult<MovieDto>) new MovieDto { Id = movie.Id, Title = movie.Title, Director = movie.Director, ReleaseYear = movie.ReleaseYear, Genre = movie.Genre };
+                ? (ActionResult<MovieDto>)NotFound()
+                : (ActionResult<MovieDto>)new MovieDto { Id = movie.Id, Title = movie.Title, Director = movie.Director, ReleaseYear = movie.ReleaseYear, Genre = movie.Genre };
         }
 
         /// <summary>
-        /// Creates a new movie from the provided <see cref="CreateMovieDto"/>.
+        /// Gets a list of movies to prefill the database.
+        /// </summary>
+        /// <returns>A list of <see cref="MovieDto"/> for pre-filling.</returns>
+        [HttpGet("new")]
+        public async Task<ActionResult<IEnumerable<MovieDto>>> GetPrefillMovies()
+        {
+            for(int i = 1; i <= 15; i++)
+            {
+                var prefill = new Movie
+                {
+                    Title = $"Sample Movie {i}",
+                    Director = $"Director {i}",
+                    ReleaseYear = 2000 + i,
+                    Genre = "Drama"
+                };
+                _db.MovieItems.Add(prefill);
+            }
+            await _db.SaveChangesAsync();
+
+            return Ok(new { Message = "Movies prefilled successfully." });
+        }
+
         /// </summary>
         /// <param name="create">The DTO containing creation data.</param>
         /// <returns>Returns <see cref="Microsoft.AspNetCore.Mvc.CreatedAtActionResult"/> with the created <see cref="MovieDto"/>.</returns>
@@ -151,5 +181,7 @@ namespace MoviesApi.Controllers
             await _db.SaveChangesAsync();
             return NoContent();
         }
+
+        #endregion
     }
 }
