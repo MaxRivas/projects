@@ -1,11 +1,6 @@
 export interface MovieDto 
 {
     /// <summary>
-    /// Movie identifier.
-    /// </summary>
-    id: number;
-
-    /// <summary>
     /// Movie title.
     /// </summary>
     title: string;

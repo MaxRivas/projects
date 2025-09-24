@@ -7,14 +7,23 @@ function App() {
 
   useEffect(() => {
     fetch('/Movies/new') // The proxy configured by SpaProxy forwards this to the backend
-      .then(response => response.json())
-      .then((data: MovieDto) => {
-        setMovies(data);
+      .then(response => {
+        // Log the entire response object to see its status, headers, etc.
+        console.log('Response object:', response);
+
+        // Check if the response is successful (status code 200-299)
+        if (!response.ok) {
+          // If not successful, try to get the error message as text
+          return response.text().then(errorText => {
+            throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+          });
+        }
       })
       .catch(error => {
-        console.error('Error fetching data:', error);
+        console.error('Fetch error data:', error);
       });
-  }, []);
+    },
+   []);
 
   return (
     <div className="App">

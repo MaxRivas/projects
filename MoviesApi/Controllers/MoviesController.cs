@@ -53,7 +53,14 @@ namespace MoviesApi.Controllers
             var movie = await _db.MovieItems.FindAsync(id);
             return null == movie
                 ? (ActionResult<MovieDto>)NotFound()
-                : (ActionResult<MovieDto>)new MovieDto { Id = movie.Id, Title = movie.Title, Director = movie.Director, ReleaseYear = movie.ReleaseYear, Genre = movie.Genre };
+                : (ActionResult<MovieDto>)new MovieDto
+                {
+                    Id = movie.Id,
+                    Title = movie.Title,
+                    Director = movie.Director,
+                    ReleaseYear = movie.ReleaseYear,
+                    Genre = movie.Genre
+            };
         }
 
         /// <summary>
@@ -87,11 +94,24 @@ namespace MoviesApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var movie = new Movie { Title = create.Title, Director = create.Director, ReleaseYear = create.ReleaseYear, Genre = create.Genre };
+                var movie = new Movie
+                {
+                    Title = create.Title,
+                    Director = create.Director,
+                    ReleaseYear = create.ReleaseYear,
+                    Genre = create.Genre
+                };
                 _db.MovieItems.Add(movie);
                 await _db.SaveChangesAsync();
 
-                var dto = new MovieDto { Id = movie.Id, Title = movie.Title, Director = movie.Director, ReleaseYear = movie.ReleaseYear, Genre = movie.Genre };
+                var dto = new MovieDto
+                {
+                    Id = movie.Id,
+                    Title = movie.Title,
+                    Director = movie.Director,
+                    ReleaseYear = movie.ReleaseYear,
+                    Genre = movie.Genre
+                };
                 return CreatedAtAction(nameof(GetById), new { id = movie.Id }, dto);
             }
 
