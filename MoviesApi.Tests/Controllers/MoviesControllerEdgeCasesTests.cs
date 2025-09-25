@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -187,9 +188,9 @@ namespace MoviesApi.Tests.Controllers
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+        /// Updating a non-existent movie should return NotFound (404).
+        /// This is a duplicate of Update_Nonexistent_ReturnsNotFound but kept for clarity.
+        /// </summary>  
         [Fact]
         public async Task Update_NonExistentMovie_ReturnsNotFound()
         {
@@ -200,6 +201,133 @@ namespace MoviesApi.Tests.Controllers
             var response = await client.PutAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{newMovie.Id}", newMovie);
 
             Assert.Equal(NotFound, response.StatusCode);
+        }
+
+        /// <summary>
+        /// Creating a duplicate movie (same Title+Director+ReleaseYear) should return 409 Conflict.
+        /// </summary>
+        [Fact]
+        public async Task Create_Duplicate_ReturnsConflict()
+        {
+            var client = _factory.CreateClient();
+
+            var create = Helper.ValidCreateMovieDto();
+            var first = await client.PostAsJsonAsync(Constants.SlashMovies, create);
+            Assert.Equal(Created, first.StatusCode);
+
+            // Attempt to create the same movie again
+            var second = await client.PostAsJsonAsync(Constants.SlashMovies, create);
+            Assert.Equal(Conflict, second.StatusCode);
+        }
+
+        /// <summary>
+        /// Patching a movie so it duplicates another movie should return 409 Conflict.
+        /// </summary>
+        [Fact]
+        public async Task Patch_ToDuplicate_ReturnsConflict()
+        {
+            var client = _factory.CreateClient();
+        /// <summary>
+        /// Prefill should be idempotent: calling it multiple times should not create duplicates.
+        /// </summary>
+        [Fact]
+        public async Task Prefill_Idempotent()
+        {
+            var client = _factory.CreateClient();
+
+            var r1 = await client.GetAsync($"{Constants.SlashMovies}/Prefill");
+            Assert.Equal(System.Net.HttpStatusCode.OK, r1.StatusCode);
+
+            var list1 = await client.GetFromJsonAsync<MovieDto[]>(Constants.SlashMovies);
+            Assert.NotNull(list1);
+
+            // Call Prefill again and ensure no new duplicates were added
+            var r2 = await client.GetAsync($"{Constants.SlashMovies}/Prefill");
+            Assert.Equal(System.Net.HttpStatusCode.OK, r2.StatusCode);
+            var list2 = await client.GetFromJsonAsync<MovieDto[]>(Constants.SlashMovies);
+            Assert.Equal(list1!.Length, list2!.Length);
+        }
+
+        /// <summary>
+        /// When the id in the route does not match the id in the body, the API should return BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Update_IdMismatch_ReturnsBadRequest()
+        {
+            var client = _factory.CreateClient();
+
+            // Create an initial movie to have a valid id
+            var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, Helper.ValidCreateMovieDto());
+            createResp.EnsureSuccessStatusCode();
+            var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
+
+            var update = Helper.ValidUpdateMovieDto();
+            update.Id = created!.Id; // body id matches created id
+
+            // Call PUT with a different id in the route
+            var badPut = await client.PutAsJsonAsync($"{Constants.SlashMovies}/{created.Id + 1}", update);
+            Assert.Equal(BadRequest, badPut.StatusCode);
+        }
+
+        /// <summary>
+        /// Duplicate detection should be case-insensitive.
+        /// </summary>
+        [Fact]
+        public async Task Create_Duplicate_CaseInsensitive_ReturnsConflict()
+        {
+            var client = _factory.CreateClient();
+
+            var first = new CreateMovieDto { Title = "CaseTest", Director = "Dir", ReleaseYear = 2001, Genre = "Drama" };
+            var r1 = await client.PostAsJsonAsync(Constants.SlashMovies, first);
+            Assert.Equal(System.Net.HttpStatusCode.Created, r1.StatusCode);
+
+            var second = new CreateMovieDto { Title = "casetest", Director = "dir", ReleaseYear = 2001, Genre = "Drama" };
+            var r2 = await client.PostAsJsonAsync(Constants.SlashMovies, second);
+            Assert.Equal(Conflict, r2.StatusCode);
+        }
+
+        /// <summary>
+        /// Sending a JSON literal null for PATCH should return BadRequest (patch==null).
+        /// </summary>
+        [Fact]
+        public async Task Patch_NullBody_ReturnsBadRequest()
+        {
+            var client = _factory.CreateClient();
+
+            // Create a movie to patch
+            var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, Helper.ValidCreateMovieDto());
+            createResp.EnsureSuccessStatusCode();
+            var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
+
+            // Send PATCH with a JSON null literal as the body
+            var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"{Constants.SlashMovies}/{created!.Id}")
+            {
+                Content = new StringContent("null", Encoding.UTF8, "application/json")
+            };
+
+            var resp = await client.SendAsync(req);
+            Assert.Equal(BadRequest, resp.StatusCode);
+        }
+
+            // Create movie A
+            var createA = Helper.ValidCreateMovieDto();
+            var respA = await client.PostAsJsonAsync(Constants.SlashMovies, createA);
+            respA.EnsureSuccessStatusCode();
+            var movieA = await respA.Content.ReadFromJsonAsync<MovieDto>();
+
+            // Create movie B with different data
+            var createB = Helper.ValidCreateMovieDto();
+            createB.Title = "Different Title";
+            createB.Director = "Different Director";
+            createB.ReleaseYear = createA.ReleaseYear + 1;
+            var respB = await client.PostAsJsonAsync(Constants.SlashMovies, createB);
+            respB.EnsureSuccessStatusCode();
+            var movieB = await respB.Content.ReadFromJsonAsync<MovieDto>();
+
+            // Patch movie B to match movie A (should conflict)
+            var patch = new PatchMovieDto { Title = movieA.Title, Director = movieA.Director, ReleaseYear = movieA.ReleaseYear };
+            var patchResp = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{movieB!.Id}", patch);
+            Assert.Equal(Conflict, patchResp.StatusCode);
         }
     }
 }

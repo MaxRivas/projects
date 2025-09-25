@@ -86,7 +86,12 @@ namespace MoviesApi.Controllers
                     ReleaseYear = 2000 + i,
                     Genre = "Drama"
                 };
-                _db.MovieItems.Add(prefill);
+                
+                // Skip adding if an identical movie already exists
+                if (!await DuplicateExistsAsync(prefill.Title, prefill.Director, prefill.ReleaseYear))
+                {
+                    _db.MovieItems.Add(prefill);
+                }
             }
             await _db.SaveChangesAsync();
 
@@ -101,6 +106,12 @@ namespace MoviesApi.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Prevent duplicates: Title + Director + ReleaseYear
+                if (await DuplicateExistsAsync(create.Title, create.Director, create.ReleaseYear))
+                {
+                    return Conflict(new { Message = "A movie with the same title, director and release year already exists." });
+                }
+
                 var movie = new Movie
                 {
                     Title = create.Title,
@@ -141,6 +152,12 @@ namespace MoviesApi.Controllers
                     var existing = await _db.MovieItems.FindAsync(id);
                     if (null != existing)
                     {
+                        // Check for conflicts with other movies when changing identifying fields
+                        if (await DuplicateExistsAsync(update.Title, update.Director, update.ReleaseYear, excludeId: id))
+                        {
+                            return Conflict(new { Message = "Another movie with the same title, director and release year already exists." });
+                        }
+
                         existing.Title = update.Title;
                         existing.Director = update.Director;
                         existing.ReleaseYear = update.ReleaseYear;
@@ -205,8 +222,40 @@ namespace MoviesApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            // After applying the patch, ensure we don't create a duplicate with another record
+            if (await DuplicateExistsAsync(existing.Title, existing.Director, existing.ReleaseYear, excludeId: existing.Id))
+            {
+                return Conflict(new { Message = "Patching would create a duplicate movie (Title+Director+ReleaseYear)." });
+            }
+
             await _db.SaveChangesAsync();
             return NoContent();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Checks for existing movie with same Title+Director+ReleaseYear. 
+        /// </summary>
+        /// <param name="title">title of movie</param>
+        /// <param name="director">director of movie</param>
+        /// <param name="releaseYear">release year of movie</param>
+        /// <param name="excludeId">id to exclude from check (for updates)</param>
+        /// <returns></returns>
+        private Task<bool> DuplicateExistsAsync(string title, string director, int releaseYear, int? excludeId = null)
+        {
+            // Normalize for case-insensitive comparison. This is fine for the InMemory provider used in tests.
+            var title = title?.ToLowerInvariant() ?? string.Empty;
+            var director = director?.ToLowerInvariant() ?? string.Empty;
+
+            var query = _db.MovieItems.AsQueryable();
+            if (excludeId.HasValue) query = query.Where(movie => movie.Id != excludeId.Value);
+
+            return query.AnyAsync(movie => movie.Title.ToLowerInvariant() == t &&
+                                  movie.Director.ToLowerInvariant() == d &&
+                                  movie.ReleaseYear == releaseYear);
         }
 
         #endregion
