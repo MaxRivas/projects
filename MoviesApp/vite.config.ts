@@ -6,13 +6,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // All requests starting with /api will be sent to the ASP.NET server
-      '/api': {
-        target: 'https://localhost:5140', // Your ASP.NET backend address
-        changeOrigin: true, // Changes the origin of the host header to the target URL
-        secure: false, // Set to true if your backend uses HTTPS with a valid certificate
-      },
-
       // Forward requests starting with /MoviesApi to the ASP.NET backend as-is
       // This ensures fetch('/MoviesApi/...') returns the backend JSON rather than Vite's index.html
       '/MoviesApi': {
