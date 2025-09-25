@@ -106,6 +106,12 @@ namespace MoviesApi.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Ensure required strings are non-empty
+                if (string.IsNullOrWhiteSpace(create.Title) || string.IsNullOrWhiteSpace(create.Director) || string.IsNullOrWhiteSpace(create.Genre))
+                {
+                    ModelState.AddModelError("", "Title, Director and Genre are required and cannot be empty.");
+                    return BadRequest(ModelState);
+                }
                 // Prevent duplicates: Title + Director + ReleaseYear
                 if (await DuplicateExistsAsync(create.Title, create.Director, create.ReleaseYear))
                 {
@@ -152,6 +158,11 @@ namespace MoviesApi.Controllers
                     var existing = await _db.MovieItems.FindAsync(id);
                     if (null != existing)
                     {
+                        if (string.IsNullOrWhiteSpace(update.Title) || string.IsNullOrWhiteSpace(update.Director) || string.IsNullOrWhiteSpace(update.Genre))
+                        {
+                            ModelState.AddModelError("", "Title, Director and Genre are required and cannot be empty.");
+                            return BadRequest(ModelState);
+                        }
                         // Check for conflicts with other movies when changing identifying fields
                         if (await DuplicateExistsAsync(update.Title, update.Director, update.ReleaseYear, excludeId: id))
                         {
@@ -210,10 +221,37 @@ namespace MoviesApi.Controllers
             if (existing == null) return NotFound();
 
             // Apply fields only when present
-            if (patch.Title != null) existing.Title = patch.Title;
-            if (patch.Director != null) existing.Director = patch.Director;
+            if (patch.Title != null)
+            {
+                if (string.IsNullOrWhiteSpace(patch.Title))
+                {
+                    ModelState.AddModelError(nameof(patch.Title), "Title cannot be empty.");
+                    return BadRequest(ModelState);
+                }
+                existing.Title = patch.Title;
+            }
+
+            if (patch.Director != null)
+            {
+                if (string.IsNullOrWhiteSpace(patch.Director))
+                {
+                    ModelState.AddModelError(nameof(patch.Director), "Director cannot be empty.");
+                    return BadRequest(ModelState);
+                }
+                existing.Director = patch.Director;
+            }
+
             if (patch.ReleaseYear.HasValue) existing.ReleaseYear = patch.ReleaseYear.Value;
-            if (patch.Genre != null) existing.Genre = patch.Genre;
+
+            if (patch.Genre != null)
+            {
+                if (string.IsNullOrWhiteSpace(patch.Genre))
+                {
+                    ModelState.AddModelError(nameof(patch.Genre), "Genre cannot be empty.");
+                    return BadRequest(ModelState);
+                }
+                existing.Genre = patch.Genre;
+            }
 
             // Validate ReleaseYear range manually if provided
             if (patch.ReleaseYear.HasValue && (patch.ReleaseYear < 1888 || patch.ReleaseYear > 2100))
@@ -247,8 +285,8 @@ namespace MoviesApi.Controllers
         private Task<bool> DuplicateExistsAsync(string title, string director, int releaseYear, int? excludeId = null)
         {
             // Normalize for case-insensitive comparison. This is fine for the InMemory provider used in tests.
-            var title = title?.ToLowerInvariant() ?? string.Empty;
-            var director = director?.ToLowerInvariant() ?? string.Empty;
+            var t = title?.ToLowerInvariant() ?? string.Empty;
+            var d = director?.ToLowerInvariant() ?? string.Empty;
 
             var query = _db.MovieItems.AsQueryable();
             if (excludeId.HasValue) query = query.Where(movie => movie.Id != excludeId.Value);

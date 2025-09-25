@@ -31,6 +31,7 @@ namespace MoviesApi.Dto
         /// <summary>
         /// Updated genre.
         /// </summary>
+        [Required]
         public string Genre { get; set; } = string.Empty;
     }
 }

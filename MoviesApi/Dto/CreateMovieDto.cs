@@ -25,6 +25,7 @@ namespace MoviesApi.Dto
         /// <summary>
         /// Genre of the movie.
         /// </summary>
+        [Required]
         public string Genre { get; set; } = string.Empty;
     }
 }
