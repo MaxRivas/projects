@@ -33,12 +33,19 @@ namespace MoviesApi.Controllers
         /// Returns all movies.
         /// </summary>
         /// <returns>A collection of <see cref="MovieDto"/> representing all stored movies.</returns>
-        [HttpGet]
-        public async Task<IEnumerable<MovieDto>> GetAll()
+        [HttpGet()]
+        public async Task<List<MovieDto>> GetAll()
         {
             return await _db.MovieItems
                 .AsNoTracking()
-                .Select(m => new MovieDto { Id = m.Id, Title = m.Title, Director = m.Director, ReleaseYear = m.ReleaseYear, Genre = m.Genre })
+                .Select(m => new MovieDto
+                {
+                    Id = m.Id,
+                    Title = m.Title,
+                    Director = m.Director,
+                    ReleaseYear = m.ReleaseYear,
+                    Genre = m.Genre
+                })
                 .ToListAsync();
         }
 
@@ -67,7 +74,7 @@ namespace MoviesApi.Controllers
         /// Gets a list of movies to prefill the database.
         /// </summary>
         /// <returns>A list of <see cref="MovieDto"/> for pre-filling.</returns>
-        [HttpGet("new")]
+        [HttpGet("Prefill")]
         public async Task<ActionResult<IEnumerable<MovieDto>>> GetPrefillMovies()
         {
             for(int i = 1; i <= 15; i++)
