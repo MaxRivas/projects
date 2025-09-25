@@ -227,6 +227,28 @@ namespace MoviesApi.Tests.Controllers
         public async Task Patch_ToDuplicate_ReturnsConflict()
         {
             var client = _factory.CreateClient();
+
+            // Create movie A
+            var createA = Helper.ValidCreateMovieDto();
+            var respA = await client.PostAsJsonAsync(Constants.SlashMovies, createA);
+            respA.EnsureSuccessStatusCode();
+            var movieA = await respA.Content.ReadFromJsonAsync<MovieDto>();
+
+            // Create movie B with different data
+            var createB = Helper.ValidCreateMovieDto();
+            createB.Title = "Different Title";
+            createB.Director = "Different Director";
+            createB.ReleaseYear = createA.ReleaseYear + 1;
+            var respB = await client.PostAsJsonAsync(Constants.SlashMovies, createB);
+            respB.EnsureSuccessStatusCode();
+            var movieB = await respB.Content.ReadFromJsonAsync<MovieDto>();
+
+            // Patch movie B to match movie A (should conflict)
+            var patch = new PatchMovieDto { Title = movieA.Title, Director = movieA.Director, ReleaseYear = movieA.ReleaseYear };
+            var patchResp = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{movieB!.Id}", patch);
+            Assert.Equal(Conflict, patchResp.StatusCode);
+        }
+
         /// <summary>
         /// Prefill should be idempotent: calling it multiple times should not create duplicates.
         /// </summary>
@@ -307,27 +329,6 @@ namespace MoviesApi.Tests.Controllers
 
             var resp = await client.SendAsync(req);
             Assert.Equal(BadRequest, resp.StatusCode);
-        }
-
-            // Create movie A
-            var createA = Helper.ValidCreateMovieDto();
-            var respA = await client.PostAsJsonAsync(Constants.SlashMovies, createA);
-            respA.EnsureSuccessStatusCode();
-            var movieA = await respA.Content.ReadFromJsonAsync<MovieDto>();
-
-            // Create movie B with different data
-            var createB = Helper.ValidCreateMovieDto();
-            createB.Title = "Different Title";
-            createB.Director = "Different Director";
-            createB.ReleaseYear = createA.ReleaseYear + 1;
-            var respB = await client.PostAsJsonAsync(Constants.SlashMovies, createB);
-            respB.EnsureSuccessStatusCode();
-            var movieB = await respB.Content.ReadFromJsonAsync<MovieDto>();
-
-            // Patch movie B to match movie A (should conflict)
-            var patch = new PatchMovieDto { Title = movieA.Title, Director = movieA.Director, ReleaseYear = movieA.ReleaseYear };
-            var patchResp = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{movieB!.Id}", patch);
-            Assert.Equal(Conflict, patchResp.StatusCode);
         }
     }
 }

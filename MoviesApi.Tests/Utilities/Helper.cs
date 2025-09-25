@@ -10,6 +10,8 @@ using MoviesApi.Dto;
 using Xunit;
 using MoviesApi.Tests.Utilities;
 using static System.Net.HttpStatusCode;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace MoviesApi.Tests.Utilities
 {
@@ -18,7 +20,7 @@ namespace MoviesApi.Tests.Utilities
         /// <summary>
         /// Creates a valid UpdateMovieDto instance for testing.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Valid UpdateMovieDto instance</returns>
         public static UpdateMovieDto ValidUpdateMovieDto()
         {
             return new UpdateMovieDto
@@ -34,7 +36,7 @@ namespace MoviesApi.Tests.Utilities
         /// <summary>
         /// Creates a valid CreateMovieDto instance for testing.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Valid CreateMovieDto instance</returns>
         public static CreateMovieDto ValidCreateMovieDto()
         {
             return new CreateMovieDto
@@ -44,6 +46,19 @@ namespace MoviesApi.Tests.Utilities
                 ReleaseYear = Constants.TestMovieReleaseYear,
                 Genre = Constants.TestMovieGenre
             };
+        }
+
+        /// <summary>
+        /// Validates the given model using DataAnnotations and returns validation results.
+        /// </summary>
+        /// <param name="model">model to validate</param>
+        /// <returns>List of validation results</returns>
+        internal static IList<ValidationResult> Validate(object model)
+        {
+            var results = new List<ValidationResult>();
+            var context = new ValidationContext(model, serviceProvider: null, items: null);
+            Validator.TryValidateObject(model, context, results, validateAllProperties: true);
+            return results;
         }
     }
 }
