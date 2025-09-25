@@ -2,18 +2,22 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "dotnet test: solution",
+			"type": "process",
+			"command": "dotnet",
+			"args": ["test", "${workspaceFolder}/projects.sln"],
+			"problemMatcher": ["$msCompile"],
+			"group": "test",
+			"presentation": { "reveal": "always" }
+		},
+		{
 			"label": "build MoviesApi",
 			"command": "dotnet",
 			"type": "process",
-			"args": [
-				"build",
-				"${workspaceFolder}/MoviesApi/MoviesApi.csproj"
-			],
+			"args": ["build", "${workspaceFolder}/MoviesApi/MoviesApi.csproj"],
 			"problemMatcher": ["$msCompile"],
 			"group": "build",
-			"presentation": {
-				"reveal": "always"
-			}
+			"presentation": { "reveal": "always" }
 		},
 		{
 			"type": "docker-build",
@@ -28,26 +32,17 @@
 		{
 			"type": "docker-run",
 			"label": "docker-run: release",
-			"dependsOn": [
-				"docker-build"
-			],
+			"dependsOn": ["docker-build"],
 			"platform": "node"
 		},
 		{
 			"type": "docker-run",
 			"label": "docker-run: debug",
-			"dependsOn": [
-				"docker-build"
-			],
+			"dependsOn": ["docker-build"],
 			"dockerRun": {
-				"env": {
-					"DEBUG": "*",
-					"NODE_ENV": "development"
-				}
+				"env": { "DEBUG": "*", "NODE_ENV": "development" }
 			},
-			"node": {
-				"enableDebugging": true
-			}
+			"node": { "enableDebugging": true }
 		}
 	]
 }
