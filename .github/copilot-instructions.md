@@ -8,7 +8,6 @@
 - This repo contains a small ASP.NET Core Web API project at `MoviesApi/` (Target: `net9.0`).
 - Key files:
   - `MoviesApi/Program.cs` — app startup and DI registration.
-  - `MoviesApi/Controllers/WeatherForecastController.cs` — example controller scaffold.
   - `MoviesApi/Models/Movie.cs` and `MoviesApi/Models/MovieContext.cs` — EF model & DbContext.
   - `MoviesApi/MoviesApi.csproj` — package references (EF Core, InMemory, NSwag/OpenAPI).
 
@@ -97,7 +96,7 @@
 - `MoviesApi/Program.cs` — app startup and OpenAPI wiring
 - `MoviesApi/Models/MovieContext.cs` — DbContext (has a discovered bug)
 - `MoviesApi/Models/Movie.cs` — entity shape and constructor nullability pattern
-- `MoviesApi/Controllers/` — example controller(s)
+- `MoviesApi/Controllers/` — controllers (e.g., `MoviesController`)
 
 # If you need human help
 

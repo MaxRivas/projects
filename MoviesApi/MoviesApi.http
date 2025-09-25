@@ -1,6 +1,14 @@
 @MoviesApi_HostAddress = http://localhost:5140
 
-GET {{MoviesApi_HostAddress}}/weatherforecast/
-Accept: application/json
+### Add movie (example)
+POST {{MoviesApi_HostAddress}}/Movies
+Content-Type: application/json
+
+{
+	"title": "Example Movie",
+	"director": "Director Name",
+	"releaseYear": 2020,
+	"genre": "Drama"
+}
 
 ###
