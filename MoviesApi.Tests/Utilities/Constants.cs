@@ -34,6 +34,6 @@ namespace MoviesApi.Tests.Utilities
 
         internal const string Development = "Development";
 
-        internal const string True = "true";
+        internal const string Patch = "PATCH";
     }
 }
