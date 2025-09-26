@@ -8,6 +8,9 @@ namespace MoviesApi.Dto.Tests
 {
     public class CreateMovieDtoTests
     {
+        /// <summary>
+        /// Tests the validation of a valid CreateMovieDto.
+        /// </summary>
         [Fact]
         public void ValidDto_PassesValidation()
         {
@@ -16,6 +19,10 @@ namespace MoviesApi.Dto.Tests
             Assert.Empty(results);
         }
 
+        /// <summary>
+        /// Tests the validation of a CreateMovieDto with null or empty title.
+        /// </summary>
+        /// <param name="value">string value to test</param>
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -28,6 +35,10 @@ namespace MoviesApi.Dto.Tests
             Assert.Contains(results, r => r.MemberNames != null && r.MemberNames.Contains(nameof(dto.Title)));
         }
 
+        /// <summary>
+        /// Tests the validation of a CreateMovieDto with null or empty director.
+        /// </summary>
+        /// <param name="value">string value to test</param>
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -40,6 +51,10 @@ namespace MoviesApi.Dto.Tests
             Assert.Contains(results, r => r.MemberNames != null && r.MemberNames.Contains(nameof(dto.Director)));
         }
 
+        /// <summary>
+        /// Tests the validation of a CreateMovieDto with out-of-range release year.
+        /// </summary>
+        /// <param name="year">int year to test</param>
         [Theory]
         [InlineData(1887)]
         [InlineData(2101)]
@@ -52,6 +67,10 @@ namespace MoviesApi.Dto.Tests
             Assert.Contains(results, r => r.MemberNames != null && r.MemberNames.Contains(nameof(dto.ReleaseYear)));
         }
 
+        /// <summary>
+        /// Tests the validation of a CreateMovieDto with boundary release years.
+        /// </summary>
+        /// <param name="year">int year to test</param>
         [Theory]
         [InlineData(1888)]
         [InlineData(2100)]
@@ -63,6 +82,10 @@ namespace MoviesApi.Dto.Tests
             Assert.Empty(results);
         }
 
+        /// <summary>
+        /// Tests the validation of a CreateMovieDto with null or empty genre.
+        /// </summary>  
+        /// <param name="value">string value to test</param>
         [Theory]
         [InlineData(null)]
         [InlineData("")]

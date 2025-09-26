@@ -76,7 +76,7 @@ namespace MoviesApi.Controllers
         private HttpClient CreateClient(string dbName)
         {
             var factory = CreateFactory(dbName);
-            return factory.CreateClient();
+            return factory.CreateClient()!;
         }
 
         /// <summary>
@@ -89,7 +89,12 @@ namespace MoviesApi.Controllers
         {
             var resp = await client.PostAsJsonAsync(Constants.SlashMovies, create);
             resp.EnsureSuccessStatusCode();
-            return await resp.Content.ReadFromJsonAsync<MovieDto>()!;
+            var dto = await resp.Content.ReadFromJsonAsync<MovieDto>();
+            if (dto is null)
+            {
+                throw new InvalidOperationException("Failed to deserialize MovieDto from create response.");
+            }
+            return dto;
         }
 
         /// <summary>
@@ -550,7 +555,7 @@ namespace MoviesApi.Controllers
             var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
 
             var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
-            var patchObj = new { Title = "" };
+            var patchObj = new { Title = string.Empty };
             var content = JsonContent.Create(patchObj);
             var resp = await client.PatchAsync(updateEndpoint, content);
 
@@ -644,9 +649,9 @@ namespace MoviesApi.Controllers
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
             var created = await CreateMovieAsync(client, create);
-
+            const string newTitle = "NewTitle";
             var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
-            var patchObj = new { Title = "NewTitle", ReleaseYear = 2022 };
+            var patchObj = new { Title = newTitle, ReleaseYear = 2022 };
             var content = JsonContent.Create(patchObj);
             var resp = await client.PatchAsync(updateEndpoint, content);
 
@@ -654,10 +659,60 @@ namespace MoviesApi.Controllers
 
             var updated = await client.GetFromJsonAsync<MovieDto>(updateEndpoint);
             Assert.NotNull(updated);
-            Assert.Equal("NewTitle", updated.Title);
+            Assert.Equal(newTitle, updated.Title);
             Assert.Equal(2022, updated.ReleaseYear);
             Assert.Equal(create.Director, updated.Director);
             Assert.Equal(create.Genre, updated.Genre);
+        }
+
+        /// <summary>
+        /// Tests that deleting an existing movie via the controller returns NoContent.
+        /// </summary>
+        [Fact]
+        public async Task Delete_Controller_NoContent()
+        {
+            // Arrange: create a fresh in-memory context and seed a movie
+            var options = new DbContextOptionsBuilder<MovieContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using (var ctx = new MovieContext(options))
+            {
+                var movie = new Movie { Title = "DelTest", Director = "D", ReleaseYear = 2000, Genre = "Drama" };
+                ctx.MovieItems.Add(movie);
+                await ctx.SaveChangesAsync();
+
+                var controller = new MoviesController(ctx);
+
+                // Act: delete the existing movie
+                var result = await controller.Delete(movie.Id);
+
+                // Assert: should be NoContent
+                Assert.IsType<Microsoft.AspNetCore.Mvc.NoContentResult>(result);
+            }
+        }
+
+        /// <summary>
+        /// Tests that deleting a non-existent movie via the controller returns NotFound.
+        /// </summary>
+        [Fact]
+        public async Task Delete_Controller_NotFound()
+        {
+            // Arrange: use a fresh in-memory context with no movies
+            var options = new DbContextOptionsBuilder<MovieContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            await using (var ctx = new MovieContext(options))
+            {
+                var controller = new MoviesController(ctx);
+
+                // Act: attempt to delete a non-existent movie id
+                var notFound = await controller.Delete(99999);
+
+                // Assert: should be NotFound
+                Assert.IsType<Microsoft.AspNetCore.Mvc.NotFoundResult>(notFound);
+            }
         }
     }
 }

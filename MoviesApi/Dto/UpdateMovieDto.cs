@@ -8,6 +8,7 @@ namespace MoviesApi.Dto
         /// Identifier of the movie being updated.
         /// </summary>
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Id must be a positive integer.")]
         public int Id { get; set; }
 
         /// <summary>
