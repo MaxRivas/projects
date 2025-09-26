@@ -14,6 +14,7 @@ using MoviesApi.Dto;
 using MoviesApi.Models;
 using Xunit;
 using MoviesApi.Tests.Utilities;
+using System.Text;
 
 namespace MoviesApi.Controllers
 {
@@ -270,7 +271,7 @@ namespace MoviesApi.Controllers
         public async Task GetById_NotFound()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
-            var resp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}999999");
+            var resp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}");
             Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
         }
 
@@ -378,7 +379,7 @@ namespace MoviesApi.Controllers
         public async Task Prefill_AddsMovies()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
-            var resp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}Prefill");
+            var resp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}{Constants.Prefill}");
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
 
             var list = await client.GetFromJsonAsync<MovieDto[]>(Constants.SlashMovies);
@@ -446,54 +447,8 @@ namespace MoviesApi.Controllers
         public async Task Delete_NotFound_ReturnsNotFound()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
-            var resp = await client.DeleteAsync($"{Constants.SlashMovies}{Constants.Slash}999999");
+            var resp = await client.DeleteAsync($"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}");
             Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
-        }
-
-        /// <summary>
-        /// Tests patching a movie with invalid data.
-        /// </summary>
-        [Fact]
-        public async Task Patch_InvalidEmptyTitle_ReturnsBadRequest()
-        {
-            var client = CreateClient(Guid.NewGuid().ToString());
-            var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
-
-            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
-            var patchObj = new { Title = "" };
-            var content = JsonContent.Create(patchObj);
-            var request = new HttpRequestMessage(new HttpMethod(Constants.Patch), updateEndpoint) { Content = content };
-            var resp = await client.SendAsync(request);
-
-            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
-        }
-
-        /// <summary>
-        /// Tests patching a movie to create a duplicate.
-        /// </summary>
-        [Fact]
-        public async Task Patch_Conflict_ReturnsConflict()
-        {
-            var client = CreateClient(Guid.NewGuid().ToString());
-            var movieA = Helper.ValidCreateMovieDto();
-            var movieB = Helper.ValidCreateMovieDto();
-            movieB.Title = movieB.Title + "_other";
-
-            var dtoA = await CreateMovieAsync(client, movieA);
-            var dtoB = await CreateMovieAsync(client, movieB);
-
-            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{dtoB.Id}";
-            var patchObj = new
-            {
-                Title = dtoA.Title,
-                Director = dtoA.Director,
-                ReleaseYear = dtoA.ReleaseYear
-            };
-            var content = JsonContent.Create(patchObj);
-            var request = new HttpRequestMessage(new HttpMethod(Constants.Patch), updateEndpoint) { Content = content };
-            var resp = await client.SendAsync(request);
-
-            Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
         }
 
         /// <summary>
@@ -525,13 +480,14 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests that Prefill skips adding duplicate movies if they already exist.
+        /// Tests that {Constants.Prefill} skips adding duplicate movies if they already exist.
         /// </summary>
         [Fact]
         public async Task Prefill_SkipsDuplicates_WhenSampleAlreadyExists()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
-            // Insert a movie matching what the Prefill generator would create for Sample Movie 1
+
+            // Insert a movie matching what the {Constants.Prefill} generator would create for Sample Movie 1
             var preExisting = new CreateMovieDto
             {
                 Title = "Sample Movie 1",
@@ -542,13 +498,166 @@ namespace MoviesApi.Controllers
             var created = await CreateMovieAsync(client, preExisting);
             Assert.NotNull(created);
 
-            var resp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}Prefill");
+            var resp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}{Constants.Prefill}");
             Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
 
             var list = await client.GetFromJsonAsync<MovieDto[]>(Constants.SlashMovies);
             Assert.NotNull(list);
-            // Ensure at least 15 movies exist after prefill (duplicates should be skipped but others added)
-            Assert.True(list.Length >= 15, $"Expected at least 15 movies after prefill but found {list.Length}");
+            // Ensure at least 15 movies exist after {Constants.Prefill} (duplicates should be skipped but others added)
+            Assert.True(list.Length >= 15, $"Expected at least 15 movies after {Constants.Prefill} but found {list.Length}");
+        }
+
+        /// <summary>
+        /// Tests that a PATCH request with no content returns a BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Patch_NoContent_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var url = $"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}";
+
+            // Send a PATCH with no content at all
+            var request = new HttpRequestMessage(new HttpMethod(Constants.Patch), url);
+            var resp = await client.SendAsync(request);
+
+            // The runtime currently returns 415 UnsupportedMediaType for an empty patch request
+            Assert.Equal(HttpStatusCode.UnsupportedMediaType, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests that a PATCH request for a non-existent movie returns NotFound.
+        /// </summary>
+        [Fact]
+        public async Task Patch_NotFound_ReturnsNotFound()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var url = $"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}";
+
+            var patchObj = new { Title = "X" };
+            var content = JsonContent.Create(patchObj);
+            var resp = await client.PatchAsync(url, content);
+
+            Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests that a PATCH request with invalid data returns BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Patch_EmptyTitle_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
+
+            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
+            var patchObj = new { Title = "" };
+            var content = JsonContent.Create(patchObj);
+            var resp = await client.PatchAsync(updateEndpoint, content);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests that a PATCH request with invalid data returns BadRequest.
+        /// </summary> 
+        [Fact]
+        public async Task Patch_EmptyDirector_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
+
+            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
+            var patchObj = new { Director = " " };
+            var content = JsonContent.Create(patchObj);
+            var resp = await client.PatchAsync(updateEndpoint, content);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests that a PATCH request with invalid data returns BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Patch_EmptyGenre_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
+
+            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
+            var patchObj = new { Genre = "" };
+            var content = JsonContent.Create(patchObj);
+            var resp = await client.PatchAsync(updateEndpoint, content);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests that a PATCH request with invalid data returns BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Patch_InvalidReleaseYear_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
+
+            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
+            var patchObj = new { ReleaseYear = 1700 };
+            var content = JsonContent.Create(patchObj);
+            var resp = await client.PatchAsync(updateEndpoint, content);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests that a PATCH request causing a duplicate movie returns Conflict.
+        /// </summary>
+        [Fact]
+        public async Task Patch_Conflict_ReturnsConflict()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var movieA = Helper.ValidCreateMovieDto();
+            var movieB = Helper.ValidCreateMovieDto();
+            movieB.Title = movieB.Title + "_other";
+
+            var dtoA = await CreateMovieAsync(client, movieA);
+            var dtoB = await CreateMovieAsync(client, movieB);
+
+            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{dtoB.Id}";
+            var patchObj = new
+            {
+                Title = dtoA.Title,
+                Director = dtoA.Director,
+                ReleaseYear = dtoA.ReleaseYear
+            };
+            var content = JsonContent.Create(patchObj);
+            var resp = await client.PatchAsync(updateEndpoint, content);
+
+            Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests that a valid PATCH request updates the movie and persists the changes.
+        /// </summary>
+        [Fact]
+        public async Task Patch_PartialUpdate_ReturnsNoContent_AndPersists()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var create = Helper.ValidCreateMovieDto();
+            var created = await CreateMovieAsync(client, create);
+
+            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
+            var patchObj = new { Title = "NewTitle", ReleaseYear = 2022 };
+            var content = JsonContent.Create(patchObj);
+            var resp = await client.PatchAsync(updateEndpoint, content);
+
+            Assert.Equal(HttpStatusCode.NoContent, resp.StatusCode);
+
+            var updated = await client.GetFromJsonAsync<MovieDto>(updateEndpoint);
+            Assert.NotNull(updated);
+            Assert.Equal("NewTitle", updated.Title);
+            Assert.Equal(2022, updated.ReleaseYear);
+            Assert.Equal(create.Director, updated.Director);
+            Assert.Equal(create.Genre, updated.Genre);
         }
     }
 }

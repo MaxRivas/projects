@@ -7,6 +7,7 @@ VS Code launch configurations
 Open the Run and Debug sidebar (Cmd+Shift+D) and choose one of the configurations in `.vscode/launch.json`:
 
 - "Debug All Tests (dotnet test)"
+
   - Runs `dotnet test` for `MoviesApi.Tests` and attaches the debugger.
   - This configuration now builds before running tests.
 

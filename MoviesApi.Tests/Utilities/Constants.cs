@@ -35,5 +35,6 @@ namespace MoviesApi.Tests.Utilities
         internal const string Development = "Development";
 
         internal const string Patch = "PATCH";
+        internal const string Prefill = "Prefill";
     }
 }
