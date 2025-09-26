@@ -66,7 +66,7 @@ namespace MoviesApi.Tests.Controllers
             // Create a new movie via POST
             var create = Helper.ValidCreateMovieDto();
             var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, create);
-            Assert.Equal(System.Net.HttpStatusCode.Created, createResp.StatusCode);
+            Assert.Equal(Created, createResp.StatusCode);
 
             var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
             Assert.NotNull(created);
@@ -77,8 +77,9 @@ namespace MoviesApi.Tests.Controllers
             Assert.NotNull(list);
             Assert.Contains(list!, m => m.Id == created.Id);
 
-            var getResp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}{created!.Id}");
-            Assert.Equal(System.Net.HttpStatusCode.OK, getResp.StatusCode);
+            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
+            var getResp = await client.GetAsync(updateEndpoint);
+            Assert.Equal(OK, getResp.StatusCode);
             var got = await getResp.Content.ReadFromJsonAsync<MovieDto>();
             Assert.Equal(Constants.TestMovieTitle, got!.Title);
 
@@ -87,18 +88,19 @@ namespace MoviesApi.Tests.Controllers
             var update = Helper.ValidUpdateMovieDto();
             update.Id = created.Id;
             update.Title = title;
-            var updateResp = await client.PutAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created.Id}", update);
-            Assert.Equal(System.Net.HttpStatusCode.NoContent, updateResp.StatusCode);
 
-            var getAfterUpdate = await client.GetFromJsonAsync<MovieDto>($"{Constants.SlashMovies}{Constants.Slash}{created.Id}");
+            var updateResp = await client.PutAsJsonAsync(updateEndpoint, update);
+            Assert.Equal(NoContent, updateResp.StatusCode);
+
+            var getAfterUpdate = await client.GetFromJsonAsync<MovieDto>(updateEndpoint);
             Assert.Equal(title, getAfterUpdate!.Title);
 
             // Delete the movie and verify it's removed
-            var deleteResp = await client.DeleteAsync($"{Constants.SlashMovies}{Constants.Slash}{created.Id}");
-            Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResp.StatusCode);
+            var deleteResp = await client.DeleteAsync(updateEndpoint);
+            Assert.Equal(NoContent, deleteResp.StatusCode);
 
-            var getAfterDelete = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}{created.Id}");
-            Assert.Equal(System.Net.HttpStatusCode.NotFound, getAfterDelete.StatusCode);
+            var getAfterDelete = await client.GetAsync(updateEndpoint);
+            Assert.Equal(NotFound, getAfterDelete.StatusCode);
         }
     }
 }

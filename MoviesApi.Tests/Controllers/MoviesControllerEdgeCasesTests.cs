@@ -24,42 +24,42 @@ namespace MoviesApi.Tests.Controllers
     {
         #region Private Fields
 
-            private readonly WebApplicationFactory<MoviesApi.Program> _factory;
+        private readonly WebApplicationFactory<MoviesApi.Program> _factory;
 
         #endregion
 
         #region Constructor
 
-            /// <summary>
-            /// Constructor that sets up a test host with a unique in-memory database for isolation.
-            /// This ensures tests do not interfere with each other's state.
-            /// The database is created fresh for each test class instance.
-            /// The in-memory database name is randomized using a GUID to avoid collisions.
-            /// HTTPS redirection is disabled to reduce log noise during tests.
-            /// The environment is set to Development to keep Swagger/OpenAPI available if needed.
-            /// The database is ensured to be created before any tests run. 
-            /// </summary>
-            /// <param name="factory"></param>
-            public MoviesControllerEdgeCasesTests(WebApplicationFactory<MoviesApi.Program> factory)
+        /// <summary>
+        /// Constructor that sets up a test host with a unique in-memory database for isolation.
+        /// This ensures tests do not interfere with each other's state.
+        /// The database is created fresh for each test class instance.
+        /// The in-memory database name is randomized using a GUID to avoid collisions.
+        /// HTTPS redirection is disabled to reduce log noise during tests.
+        /// The environment is set to Development to keep Swagger/OpenAPI available if needed.
+        /// The database is ensured to be created before any tests run. 
+        /// </summary>
+        /// <param name="factory"></param>
+        public MoviesControllerEdgeCasesTests(WebApplicationFactory<MoviesApi.Program> factory)
+        {
+            // Use a unique in-memory DB name per test class to isolate state between runs.
+            var uniqueDbName = "EdgeCaseTest_MoviesDb_" + Guid.NewGuid().ToString(Constants.N);
+            _factory = factory.WithWebHostBuilder(builder =>
             {
-                // Use a unique in-memory DB name per test class to isolate state between runs.
-                var uniqueDbName = "EdgeCaseTest_MoviesDb_" + Guid.NewGuid().ToString(Constants.N);
-                _factory = factory.WithWebHostBuilder(builder =>
-                {
-                    builder.UseSetting(Constants.InMemoryDbNameKey, uniqueDbName);
-    
-                    // Disable HTTPS redirect to reduce test log noise
-                    builder.UseSetting(Constants.EnableHttpsRedirectKey, Constants.False);
-                });
-    
-                // Ensure the in-memory database is created prior to running tests
-                using (var scope = _factory.Services.CreateScope())
-                {
-                    var db = scope.ServiceProvider.GetRequiredService<MovieContext>();
-                    db.Database.EnsureCreated();
-                }
+                builder.UseSetting(Constants.InMemoryDbNameKey, uniqueDbName);
+
+                // Disable HTTPS redirect to reduce test log noise
+                builder.UseSetting(Constants.EnableHttpsRedirectKey, Constants.False);
+            });
+
+            // Ensure the in-memory database is created prior to running tests
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<MovieContext>();
+                db.Database.EnsureCreated();
             }
-            
+        }
+
         #endregion
 
         /// <summary>
@@ -110,9 +110,10 @@ namespace MoviesApi.Tests.Controllers
             var newMovie = Helper.ValidUpdateMovieDto();
             var response = await client.PostAsJsonAsync(Constants.SlashMovies, newMovie);
             var created = await response.Content.ReadFromJsonAsync<MovieDto>();
+            Assert.NotNull(created);
 
             var patch = new PatchMovieDto { ReleaseYear = 1400 };
-            response = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created!.Id}", patch);
+            response = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created.Id}", patch);
             Assert.Equal(BadRequest, response.StatusCode);
         }
 
@@ -127,7 +128,7 @@ namespace MoviesApi.Tests.Controllers
             // ReleaseYear lower bound and long title
             var releaseYear = 1888;// ReleaseYear lower bound and long title
             var longTitle = new string('A', 512);
-            var newMovie = new CreateMovieDto 
+            var newMovie = new CreateMovieDto
             {
                 Title = longTitle,
                 Director = Constants.TestMovieDirector,
@@ -143,7 +144,7 @@ namespace MoviesApi.Tests.Controllers
             Assert.Equal(releaseYear, created!.ReleaseYear);
             Assert.Equal(longTitle, created.Title);
         }
-    
+
         /// <summary>
         /// Patch should only update the fields provided in the Patch DTO and leave other fields unchanged.
         /// </summary>
@@ -157,15 +158,18 @@ namespace MoviesApi.Tests.Controllers
             var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, newMovie);
             createResp.EnsureSuccessStatusCode();
             var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
+            Assert.NotNull(created);
 
             // Patch only the Title
             var newTitle = "Updating the Title only";
+            string patchEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
             var patch = new PatchMovieDto { Title = newTitle };
-            var patchResp = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created!.Id}", patch);
+            var patchResp = await client.PatchAsJsonAsync(patchEndpoint, patch);
             Assert.Equal(NoContent, patchResp.StatusCode);
 
-           var response = await client.GetFromJsonAsync<MovieDto>($"{Constants.SlashMovies}{Constants.Slash}{created.Id}");
-            Assert.Equal(newTitle, response!.Title);
+            var response = await client.GetFromJsonAsync<MovieDto>(patchEndpoint);
+            Assert.NotNull(response);
+            Assert.Equal(newTitle, response.Title);
             Assert.Equal(Constants.TestMovieDirector, response.Director); // unchanged
         }
 
@@ -182,9 +186,10 @@ namespace MoviesApi.Tests.Controllers
             var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, newMovie);
             createResp.EnsureSuccessStatusCode();
             var response = await createResp.Content.ReadFromJsonAsync<MovieDto>();
+            Assert.NotNull(response);
 
             var patch = new PatchMovieDto { ReleaseYear = 1700 };
-            var patchResp  = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{response!.Id}", patch);
+            var patchResp = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{response.Id}", patch);
             Assert.Equal(BadRequest, patchResp.StatusCode);
         }
 
@@ -234,6 +239,7 @@ namespace MoviesApi.Tests.Controllers
             var respA = await client.PostAsJsonAsync(Constants.SlashMovies, createA);
             respA.EnsureSuccessStatusCode();
             var movieA = await respA.Content.ReadFromJsonAsync<MovieDto>();
+            Assert.NotNull(movieA);
 
             // Create movie B with different data
             var createB = Helper.ValidCreateMovieDto();
@@ -243,10 +249,11 @@ namespace MoviesApi.Tests.Controllers
             var respB = await client.PostAsJsonAsync(Constants.SlashMovies, createB);
             respB.EnsureSuccessStatusCode();
             var movieB = await respB.Content.ReadFromJsonAsync<MovieDto>();
+            Assert.NotNull(movieB);
 
             // Patch movie B to match movie A (should conflict)
             var patch = new PatchMovieDto { Title = movieA.Title, Director = movieA.Director, ReleaseYear = movieA.ReleaseYear };
-            var patchResp = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{movieB!.Id}", patch);
+            var patchResp = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{movieB.Id}", patch);
             Assert.Equal(Conflict, patchResp.StatusCode);
         }
 
@@ -257,18 +264,20 @@ namespace MoviesApi.Tests.Controllers
         public async Task Prefill_Idempotent()
         {
             var client = _factory.CreateClient();
+            const string prefillEndpoint = $"{Constants.SlashMovies}{Constants.Slash}Prefill";
 
-            var r1 = await client.GetAsync($"{Constants.SlashMovies}/Prefill");
+            var r1 = await client.GetAsync(prefillEndpoint);
             Assert.Equal(System.Net.HttpStatusCode.OK, r1.StatusCode);
 
             var list1 = await client.GetFromJsonAsync<MovieDto[]>(Constants.SlashMovies);
             Assert.NotNull(list1);
 
             // Call Prefill again and ensure no new duplicates were added
-            var r2 = await client.GetAsync($"{Constants.SlashMovies}/Prefill");
+            var r2 = await client.GetAsync(prefillEndpoint);
             Assert.Equal(System.Net.HttpStatusCode.OK, r2.StatusCode);
             var list2 = await client.GetFromJsonAsync<MovieDto[]>(Constants.SlashMovies);
-            Assert.Equal(list1!.Length, list2!.Length);
+            Assert.NotNull(list2);
+            Assert.Equal(list1!.Length, list2.Length);
         }
 
         /// <summary>
@@ -283,12 +292,13 @@ namespace MoviesApi.Tests.Controllers
             var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, Helper.ValidCreateMovieDto());
             createResp.EnsureSuccessStatusCode();
             var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
+            Assert.NotNull(created);
 
             var update = Helper.ValidUpdateMovieDto();
-            update.Id = created!.Id; // body id matches created id
+            update.Id = created.Id; // body id matches created id
 
             // Call PUT with a different id in the route
-            var badPut = await client.PutAsJsonAsync($"{Constants.SlashMovies}/{created.Id + 1}", update);
+            var badPut = await client.PutAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created.Id + 1}", update);
             Assert.Equal(BadRequest, badPut.StatusCode);
         }
 
@@ -300,11 +310,24 @@ namespace MoviesApi.Tests.Controllers
         {
             var client = _factory.CreateClient();
 
-            var first = new CreateMovieDto { Title = "CaseTest", Director = "Dir", ReleaseYear = 2001, Genre = "Drama" };
+
+            var first = new CreateMovieDto
+            {
+                Title = Constants.TestMovieTitle,
+                Director = Constants.TestMovieDirector,
+                ReleaseYear = Constants.TestMovieReleaseYear,
+                Genre = Constants.TestMovieGenre
+            };
             var r1 = await client.PostAsJsonAsync(Constants.SlashMovies, first);
             Assert.Equal(System.Net.HttpStatusCode.Created, r1.StatusCode);
 
-            var second = new CreateMovieDto { Title = "casetest", Director = "dir", ReleaseYear = 2001, Genre = "Drama" };
+            var second = new CreateMovieDto
+            {
+                Title = Constants.TestMovieTitle.ToLower(),
+                Director = Constants.TestMovieDirector.ToLower(),
+                ReleaseYear = Constants.TestMovieReleaseYear,
+                Genre = Constants.TestMovieGenre.ToLower()
+            };
             var r2 = await client.PostAsJsonAsync(Constants.SlashMovies, second);
             Assert.Equal(Conflict, r2.StatusCode);
         }
@@ -323,7 +346,7 @@ namespace MoviesApi.Tests.Controllers
             var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
 
             // Send PATCH with a JSON null literal as the body
-            var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"{Constants.SlashMovies}/{created!.Id}")
+            var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"{Constants.SlashMovies}{Constants.Slash}{created!.Id}")
             {
                 Content = new StringContent("null", Encoding.UTF8, "application/json")
             };

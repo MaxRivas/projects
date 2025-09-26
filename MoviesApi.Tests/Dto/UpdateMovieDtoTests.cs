@@ -28,10 +28,10 @@ namespace MoviesApi.Dto.Tests
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void Title_NullOrEmpty_Fails(string titleValue)
+        public void Title_NullOrEmpty_Fails(string? titleValue)
         {
             var dto = Helper.ValidUpdateMovieDto();
-            dto.Title = titleValue!;
+            dto.Title = titleValue ?? string.Empty;
             var results = Helper.Validate(dto);
             Assert.NotEmpty(results);
             Assert.Contains(results, r => r.MemberNames != null && r.MemberNames.Contains(nameof(dto.Title)));
@@ -44,10 +44,10 @@ namespace MoviesApi.Dto.Tests
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void Director_NullOrEmpty_Fails(string directorValue)
+        public void Director_NullOrEmpty_Fails(string? directorValue)
         {
             var dto = Helper.ValidUpdateMovieDto();
-            dto.Director = directorValue!;
+            dto.Director = directorValue ?? string.Empty;
             var results = Helper.Validate(dto);
             Assert.NotEmpty(results);
             Assert.Contains(results, r => r.MemberNames != null && r.MemberNames.Contains(nameof(dto.Director)));
@@ -56,10 +56,10 @@ namespace MoviesApi.Dto.Tests
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void Genre_NullOrEmpty_Fails(string genreValue)
+        public void Genre_NullOrEmpty_Fails(string? genreValue)
         {
             var dto = Helper.ValidUpdateMovieDto();
-            dto.Genre = genreValue!;
+            dto.Genre = genreValue ?? string.Empty;
             var results = Helper.Validate(dto);
             Assert.NotEmpty(results);
             Assert.Contains(results, r => r.MemberNames != null && r.MemberNames.Contains(nameof(dto.Genre)));
