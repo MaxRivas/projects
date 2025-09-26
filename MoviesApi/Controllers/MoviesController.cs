@@ -67,7 +67,7 @@ namespace MoviesApi.Controllers
                     Director = movie.Director,
                     ReleaseYear = movie.ReleaseYear,
                     Genre = movie.Genre
-            };
+                };
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace MoviesApi.Controllers
         [HttpGet("Prefill")]
         public async Task<ActionResult<IEnumerable<MovieDto>>> GetPrefillMovies()
         {
-            for(int i = 1; i <= 15; i++)
+            for (int i = 1; i <= 15; i++)
             {
                 var prefill = new Movie
                 {
@@ -86,7 +86,7 @@ namespace MoviesApi.Controllers
                     ReleaseYear = 2000 + i,
                     Genre = "Drama"
                 };
-                
+
                 // Skip adding if an identical movie already exists
                 if (!await DuplicateExistsAsync(prefill.Title, prefill.Director, prefill.ReleaseYear))
                 {
@@ -109,7 +109,7 @@ namespace MoviesApi.Controllers
                 // Ensure required strings are non-empty
                 if (string.IsNullOrWhiteSpace(create.Title) || string.IsNullOrWhiteSpace(create.Director) || string.IsNullOrWhiteSpace(create.Genre))
                 {
-                    ModelState.AddModelError("", "Title, Director and Genre are required and cannot be empty.");
+                    ModelState.AddModelError(string.Empty, "Title, Director and Genre are required and cannot be empty.");
                     return BadRequest(ModelState);
                 }
                 // Prevent duplicates: Title + Director + ReleaseYear
@@ -215,13 +215,19 @@ namespace MoviesApi.Controllers
         [HttpPatch("{id:int}")]
         public async Task<IActionResult> Patch(int id, [FromBody] PatchMovieDto patch)
         {
-            if (patch == null) return BadRequest();
+            if (null == patch)
+            {
+                return BadRequest();
+            }
 
             var existing = await _db.MovieItems.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (null == existing)
+            {
+                return NotFound();
+            }
 
             // Apply fields only when present
-            if (patch.Title != null)
+            if (null != patch.Title)
             {
                 if (string.IsNullOrWhiteSpace(patch.Title))
                 {
@@ -231,7 +237,7 @@ namespace MoviesApi.Controllers
                 existing.Title = patch.Title;
             }
 
-            if (patch.Director != null)
+            if (null != patch.Director)
             {
                 if (string.IsNullOrWhiteSpace(patch.Director))
                 {
@@ -241,9 +247,12 @@ namespace MoviesApi.Controllers
                 existing.Director = patch.Director;
             }
 
-            if (patch.ReleaseYear.HasValue) existing.ReleaseYear = patch.ReleaseYear.Value;
+            if (null != patch.ReleaseYear)
+            {
+                existing.ReleaseYear = patch.ReleaseYear.Value;
+            }
 
-            if (patch.Genre != null)
+            if (null != patch.Genre)
             {
                 if (string.IsNullOrWhiteSpace(patch.Genre))
                 {

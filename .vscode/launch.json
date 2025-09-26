@@ -43,6 +43,44 @@
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    {
+      "name": "Debug All Tests (dotnet test)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "dotnet",
+      "args": [
+        "test",
+        "${workspaceFolder}/MoviesApi.Tests/MoviesApi.Tests.csproj",
+        "--logger:console;verbosity=detailed"
+      ],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Single Test (prompt for filter)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "dotnet",
+      "args": [
+        "test",
+        "${workspaceFolder}/MoviesApi.Tests/MoviesApi.Tests.csproj",
+        "--filter",
+        "${input:testFilter}",
+        "--logger:console;verbosity=detailed"
+      ],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "integratedTerminal"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "testFilter",
+      "type": "promptString",
+      "description": "Enter a test filter for dotnet test (e.g. FullyQualifiedName~Namespace.Class.Method or DisplayName~MethodName)",
+      "default": "FullyQualifiedName~MoviesApi.Controllers.MoviesControllerTest.Create_AddsMovie_ReturnsCreated"
     }
   ]
 }

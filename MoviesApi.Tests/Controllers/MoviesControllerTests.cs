@@ -37,6 +37,11 @@ namespace MoviesApi.Controllers
 
         #endregion
 
+        /// <summary>
+        /// Creates a new factory for testing with a unique in-memory database.
+        /// </summary>
+        /// <param name="dbName">DB name for the in-memory database.</param>
+        /// <returns>WebApplicationFactory instance for testing.</returns>
         private WebApplicationFactory<Program> CreateFactory(string dbName)
         {
             return _baseFactory.WithWebHostBuilder(builder =>
@@ -62,12 +67,23 @@ namespace MoviesApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Creates a new HttpClient for testing with a unique in-memory database.
+        /// </summary>
+        /// <param name="dbName">DB name for the in-memory database.</param>
+        /// <returns>HttpClient instance for making requests.</returns>
         private HttpClient CreateClient(string dbName)
         {
             var factory = CreateFactory(dbName);
             return factory.CreateClient();
         }
 
+        /// <summary>
+        /// Helper to create a movie via the API.
+        /// </summary>
+        /// <param name="client">HttpClient instance for making requests.</param>
+        /// <param name="create">The movie creation DTO.</param>
+        /// <returns>The created MovieDto.</returns>
         private async Task<MovieDto> CreateMovieAsync(HttpClient client, CreateMovieDto create)
         {
             var resp = await client.PostAsJsonAsync(Constants.SlashMovies, create);
@@ -95,7 +111,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests the creation of a duplicate movie.
+        /// Tests the creation of a duplicate movie returning Conflict.
         /// </summary>
         [Fact]
         public async Task Create_Duplicate_ReturnsConflict()
@@ -111,10 +127,97 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests the creation of a movie with invalid data.
+        /// Tests the creation of a movie and verifies it is persisted.
         /// </summary>
         [Fact]
-        public async Task Create_Invalid_ReturnsBadRequest()
+        public async Task Create_Success_ReturnsCreatedAndPersists()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var create = Helper.ValidCreateMovieDto();
+
+            var result = await client.PostAsJsonAsync(Constants.SlashMovies, create);
+            Assert.Equal(HttpStatusCode.Created, result.StatusCode);
+            var dto = await result.Content.ReadFromJsonAsync<MovieDto>();
+            Assert.NotNull(dto);
+            Assert.True(dto.Id > 0);
+            Assert.Equal(create.Title, dto.Title);
+            Assert.Equal(create.Director, dto.Director);
+            Assert.Equal(create.ReleaseYear, dto.ReleaseYear);
+            Assert.Equal(create.Genre, dto.Genre);
+
+            var persisted = await client.GetFromJsonAsync<MovieDto>($"{Constants.SlashMovies}{Constants.Slash}{dto.Id}");
+            Assert.NotNull(persisted);
+            Assert.Equal(create.Title, persisted.Title);
+            Assert.Equal(create.Director, persisted.Director);
+            Assert.Equal(create.ReleaseYear, persisted.ReleaseYear);
+            Assert.Equal(create.Genre, persisted.Genre);
+        }
+
+        /// <summary>
+        /// Tests the creation of a movie with invalid genre data returning BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Create_InvalidGenre_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var create = Helper.ValidCreateMovieDto();
+            create.Genre = string.Empty;
+
+            var resp = await client.PostAsJsonAsync(Constants.SlashMovies, create);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests the creation of a movie with invalid title data returning BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Create_InvalidTitle_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var create = Helper.ValidCreateMovieDto();
+            create.Title = string.Empty;
+
+            var resp = await client.PostAsJsonAsync(Constants.SlashMovies, create);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests the creation of a movie with invalid director data returning BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Create_InvalidDirector_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var create = Helper.ValidCreateMovieDto();
+            create.Director = string.Empty;
+
+            var resp = await client.PostAsJsonAsync(Constants.SlashMovies, create);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests the creation of a movie with invalid release date data returning BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Create_InvalidReleaseDate_ReturnsBadRequest()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var create = Helper.ValidCreateMovieDto();
+            create.ReleaseYear = -1800;
+
+            var resp = await client.PostAsJsonAsync(Constants.SlashMovies, create);
+
+            Assert.Equal(HttpStatusCode.BadRequest, resp.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests the creation of a movie with invalid release date data returning BadRequest.
+        /// </summary>
+        [Fact]
+        public async Task Create_InvalidParameters_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             // Build an intentionally invalid payload (missing required fields / out-of-range year)
@@ -126,7 +229,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests the retrieval of all movies.
+        /// Tests retrieval of all movies returning the inserted movies.
         /// </summary>
         [Fact]
         public async Task GetAll_ReturnsInsertedMovies()
@@ -161,7 +264,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests retrieval of a movie by ID.
+        /// Tests retrieval of a movie by ID returning NotFound for non-existent ID.
         /// </summary>
         [Fact]
         public async Task GetById_NotFound()
@@ -172,7 +275,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests successful update of a movie.
+        /// Tests successful update of a movie and verifies changes are persisted.
         /// </summary>
         [Fact]
         public async Task Update_Succeeds()
@@ -199,7 +302,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests update of a non-existent movie.
+        /// Tests update of a non-existent movie causing a conflict.
         /// </summary>
         [Fact]
         public async Task Update_Conflict_ReturnsConflict()
@@ -227,7 +330,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests update of a non-existent movie.
+        /// Tests update of a non-existent movie returning NotFound.
         /// </summary>
         [Fact]
         public async Task Delete_Succeeds()
@@ -245,7 +348,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests patching a movie.
+        /// Tests patching a movie successfully.
         /// </summary> 
         [Fact]
         public async Task Patch_Succeeds()
@@ -269,7 +372,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests pre-filling the database with initial movie data.
+        /// Tests pre-filling the database with initial movie data and verifies movies are added.
         /// </summary>
         [Fact]
         public async Task Prefill_AddsMovies()
@@ -284,7 +387,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests retrieval of a movie by ID.
+        /// Tests retrieval of a movie by ID and verifies the returned data matches the created movie.
         /// </summary>
         [Fact]
         public async Task GetById_Succeeds()
@@ -306,7 +409,7 @@ namespace MoviesApi.Controllers
         }
 
         /// <summary>
-        /// Tests update with ID mismatch.
+        /// Tests update with ID mismatch returning BadRequest.
         /// </summary>
         [Fact]
         public async Task Update_IdMismatch_ReturnsBadRequest()
