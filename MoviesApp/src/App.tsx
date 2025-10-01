@@ -51,7 +51,9 @@ function App() {
       </nav>
 
       <main>
-        {route === 'welcome' && <WelcomePage />}
+        {route === 'welcome' && (
+          <WelcomePage onShowMovies={() => setRoute('movies')} />
+        )}
         {route === 'movies' && <MoviesList movies={movies} />}
       </main>
     </div>
