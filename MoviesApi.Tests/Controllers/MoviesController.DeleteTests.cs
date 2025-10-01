@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using MoviesApi.Models;
 using MoviesApi.Controllers;
 using Xunit;
+using MoviesApi.Tests.Utilities;
+using System.Net;
 
 namespace MoviesApi.Controllers
 {
-    public class MoviesControllerUnitTests
+    public partial class MoviesControllerTests
     {
         /// <summary>
         /// Tests that deleting an existing movie via the controller returns NoContent.
@@ -57,6 +59,35 @@ namespace MoviesApi.Controllers
                 // Assert: should be NotFound
                 Assert.IsType<Microsoft.AspNetCore.Mvc.NotFoundResult>(notFound);
             }
+        }
+
+        /// <summary>
+        /// Tests update of a non-existent movie returning NotFound.
+        /// </summary>
+        [Fact]
+        public async Task Delete_Succeeds()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var create = Helper.ValidCreateMovieDto();
+            var created = await CreateMovieAsync(client, create);
+
+            var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
+            var del = await client.DeleteAsync(updateEndpoint);
+            Assert.Equal(HttpStatusCode.NoContent, del.StatusCode);
+
+            var get = await client.GetAsync(updateEndpoint);
+            Assert.Equal(HttpStatusCode.NotFound, get.StatusCode);
+        }
+
+        /// <summary>
+        /// Tests deletion of a non-existent movie.
+        /// </summary>
+        [Fact]
+        public async Task Delete_NotFound_ReturnsNotFound()
+        {
+            var client = CreateClient(Guid.NewGuid().ToString());
+            var resp = await client.DeleteAsync($"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}");
+            Assert.Equal(HttpStatusCode.NotFound, resp.StatusCode);
         }
     }
 }
