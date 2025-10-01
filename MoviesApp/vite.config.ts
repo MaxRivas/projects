@@ -9,6 +9,7 @@ export default defineConfig({
       // Forward requests starting with /MoviesApi to the ASP.NET backend as-is
       // This ensures fetch('/MoviesApi/...') returns the backend JSON rather than Vite's index.html
       '/MoviesApi': {
+        // The backend exposes HTTP on port 5140 (see launchSettings.json). Use http:// so the proxy connects correctly.
         target: 'https://localhost:5140',
         changeOrigin: true,
         secure: false,
