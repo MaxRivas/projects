@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import type { MovieDto } from './types/movie';
+import WelcomePage from './pages/WelcomePage';
+import MoviesList from './components/MoviesList';
 
 function App() {
   const [movies, setMovies] = useState<MovieDto[]>([]);
+  const [route, setRoute] = useState<'welcome' | 'movies'>('welcome');
 
- useEffect(() => {
+  useEffect(() => {
   const fetchData = async () => {
     // Attempt to prefill server-side data; ignore errors
     try { await fetch('/MoviesApi/Prefill'); } catch { /* ignore */ }
@@ -42,23 +45,15 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Prefilled movie Data</h1>
-        {movies.length > 0 ? (
-            <ul>
-              {movies.map((item, index) => (
-               <li key={index}>
-                <p><strong>Movie Title:</strong> {item.title}</p>
-                <p><strong>Movie Director:</strong> {item.director}</p>
-                <p><strong>Release Year:</strong> {item.releaseYear}</p>
-                <p><strong>Genre:</strong> {item.genre}</p>
-              </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Loading items...</p>
-          )}
-      </header>
+      <nav style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
+        <button onClick={() => setRoute('welcome')}>Welcome</button>
+        <button onClick={() => setRoute('movies')}>Movies</button>
+      </nav>
+
+      <main>
+        {route === 'welcome' && <WelcomePage />}
+        {route === 'movies' && <MoviesList movies={movies} />}
+      </main>
     </div>
   );
 }
