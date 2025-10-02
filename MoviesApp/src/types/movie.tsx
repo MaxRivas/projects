@@ -59,8 +59,7 @@ export const columns: ColumnDef<MovieDto>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const movie = row.original
+    cell: () => {
  
       return (
         <DropdownMenu>
