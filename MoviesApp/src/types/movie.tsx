@@ -1,4 +1,8 @@
-export interface MovieDto 
+"use client"
+ 
+import { type ColumnDef } from "@tanstack/react-table"
+
+export type MovieDto = 
 {
     /// <summary>
     /// Movie identifier.
@@ -25,3 +29,18 @@ export interface MovieDto
     /// </summary>
     genre: string;
 }
+ 
+export const columns: ColumnDef<MovieDto>[] = [
+  {
+    accessorKey: "title",
+    header: "Title",
+  },
+  {
+    accessorKey: "releaseYear",
+    header: "Release Year",
+  },
+  {
+    accessorKey: "genre",
+    header: "Genre",
+  },
+]

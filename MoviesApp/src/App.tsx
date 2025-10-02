@@ -46,8 +46,6 @@ function App() {
   return (
     <div className="App">
       <nav style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
-        <button onClick={() => setRoute('welcome')}>Welcome</button>
-        <button onClick={() => setRoute('movies')}>Movies</button>
       </nav>
 
       <main>

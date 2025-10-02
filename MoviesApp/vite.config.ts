@@ -37,6 +37,14 @@ export default defineConfig({
     ],
   },
   server: {
+    // Enable CORS for local development and add permissive headers to help with
+    // cross-origin debugging. This is safe for local dev only.
+    cors: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': '*',
+    },
     proxy: {
       // Forward requests starting with /MoviesApi to the ASP.NET backend as-is
       // This ensures fetch('/MoviesApi/...') returns the backend JSON rather than Vite's index.html
@@ -45,6 +53,22 @@ export default defineConfig({
         target: 'https://localhost:5140',
         changeOrigin: true,
         secure: false,
+        // Bypass proxy for Vite internals, source maps, and node_modules so assets
+        // are served by the dev server instead of being forwarded to the API.
+        bypass: (req) => {
+          if (!req || !req.url) return;
+          const url = req.url;
+          // If the request is for a Vite dev asset, return the original url to bypass proxy
+          if (
+            url.startsWith('/node_modules') ||
+            url.startsWith('/@') ||
+            url.endsWith('.map') ||
+            url.includes('/src/') ||
+            url.includes('.vite')
+          ) {
+            return url;
+          }
+        },
         // Special-case Prefill (controller is MoviesController -> /Movies/Prefill)
         // and otherwise remove the /MoviesApi prefix so backend sees routes like /Movies
         rewrite: (path) => path.replace(/^\/MoviesApi\/Prefill/, '/Movies/Prefill').replace(/^\/MoviesApi/, ''),

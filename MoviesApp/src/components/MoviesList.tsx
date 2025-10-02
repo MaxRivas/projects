@@ -1,4 +1,3 @@
-import React from 'react';
 import type { MovieDto } from '../types/movie';
 
 type Props = {
