@@ -1,4 +1,6 @@
 import type { MovieDto } from '../types/movie';
+import { DataTable } from '../types/dataTable';
+import {columns } from '../types/movie';
 
 type Props = {
   movies: MovieDto[];
@@ -10,18 +12,8 @@ export default function MoviesList({ movies }: Props) {
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h2>Movies</h2>
-      <ul>
-        {movies.map((m, i) => (
-          <li key={i} style={{ marginBottom: '0.75rem' }}>
-            <div><strong>Title:</strong> {m.title}</div>
-            <div><strong>Director:</strong> {m.director}</div>
-            <div><strong>Release Year:</strong> {m.releaseYear}</div>
-            <div><strong>Genre:</strong> {m.genre}</div>
-          </li>
-        ))}
-      </ul>
+   <div className="container mx-auto py-10">
+      <DataTable columns={columns} data={movies} />
     </div>
   );
 }
