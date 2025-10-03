@@ -1,60 +1,117 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import type { MovieDto } from './types/movie';
-import WelcomePage from './pages/WelcomePage';
-import MoviesList from './components/MoviesList';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+
+// Import namespaces to avoid assuming default export shape
+import * as LoginPageModule from "./pages/LoginPage";
+import * as WelcomePageModule from "./pages/WelcomePage";
+import * as MoviesListModule from "./components/MoviesList";
+
+/* Resolve component exports robustly:
+   prefer `default`, then common named exports used in this repo (CardDemo, LoginPage, WelcomePage, MoviesList).
+   Provide a safe fallback noop component to avoid transform/runtime failures.
+*/
+const resolveDefault =
+  (mod: any, names: string[]) =>
+    (mod && (mod.default ?? names.map(n => mod[n]).find(Boolean))) ??
+    (() => null);
+
+type MovieDto = {
+  id: number;
+  title: string;
+  director: string;
+  genre: string;
+  releaseYear: number;
+};
+
+type LoginProps = { onLogin: (u: string, p: string) => Promise<boolean> };
+type WelcomeProps = { onShowMovies: () => void };
+type MoviesListProps = { movies: MovieDto[] };
+
+const LoginComp = resolveDefault(LoginPageModule, ["CardDemo", "LoginPage"]) as React.ComponentType<LoginProps>;
+const WelcomeComp = resolveDefault(WelcomePageModule, ["WelcomePage"]) as React.ComponentType<WelcomeProps>;
+const MoviesListComp = resolveDefault(MoviesListModule, ["MoviesList"]) as React.ComponentType<MoviesListProps>;
 
 function App() {
   const [movies, setMovies] = useState<MovieDto[]>([]);
-  const [route, setRoute] = useState<'welcome' | 'movies'>('welcome');
+  const [route, setRoute] = useState<"login" | "welcome" | "movies">("login");
+  const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-  const fetchData = async () => {
-    // Attempt to prefill server-side data; ignore errors
-    try { await fetch('/MoviesApi/Prefill'); } catch { /* ignore */ }
-
-    // Fetch movies and set state. On any failure, leave movies empty.
+  async function requestToken(creds?: { username: string; password: string }): Promise<string | null> {
     try {
-      const res = await fetch('/MoviesApi/Movies');
-      if (!res.ok) { setMovies([]); return; }
+      const body = creds ?? { username: "dev", password: "dev" };
+      const res = await fetch("/MoviesApi/Auth/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) return null;
       const data = await res.json();
-      // Accept either an array or common wrapper shapes { items: [...] } / { value: [...] }
-      if (Array.isArray(data)) {
-        setMovies(data as MovieDto[]);
-        return;
-      }
+      return data?.access_token ?? data?.token ?? null;
+    } catch {
+      return null;
+    }
+  }
 
-      const d = data as unknown;
-      if (d && typeof d === 'object') {
-        const obj = d as Record<string, unknown>;
-        const maybe = obj['items'] ?? obj['value'] ?? null;
-        if (Array.isArray(maybe)) {
-          setMovies(maybe as MovieDto[]);
-          return;
-        }
-      }
+  // Accept optional explicitToken to avoid race with setToken
+  async function fetchWithAuth(input: RequestInfo, init?: RequestInit, explicitToken?: string) {
+    const headers = new Headers(init?.headers ?? {});
+    const bearer = explicitToken ?? token;
+    if (bearer) headers.set("Authorization", `Bearer ${bearer}`);
+    return fetch(input, { ...(init ?? {}), headers });
+  }
 
-      setMovies([]);
+  async function prefillAndLoadMovies(activeToken?: string) {
+    const t = activeToken ?? token;
+    if (!t) return;
+    try {
+      await fetchWithAuth("/MoviesApi/Prefill", undefined, t);
+    } catch (e) {
+      console.warn("Prefill failed", e);
+    }
+    try {
+      const res = await fetchWithAuth("/MoviesApi/Movies", undefined, t);
+      if (res.ok) {
+        const data = await res.json();
+        setMovies(data ?? []);
+      } else {
+        setMovies([]);
+      }
     } catch {
       setMovies([]);
     }
-  };
+  }
 
-  fetchData();
-}, []); // Add a dependency array
+  // Attempt a silent/dev token on mount (optional)
+  useEffect(() => {
+    (async () => {
+      const devToken = await requestToken();
+      if (devToken) {
+        setToken(devToken);
+        await prefillAndLoadMovies(devToken);
+        setRoute("movies");
+      }
+    })();
+  }, []);
+
+  async function handleLogin(username: string, password: string) {
+    const t = await requestToken({ username, password });
+    if (!t) return false;
+    setToken(t);
+    await prefillAndLoadMovies(t);
+    setRoute("movies");
+    return true;
+  }
 
   return (
-    <div className="App">
-      <nav style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
-      </nav>
-
-      <main>
-        {route === 'welcome' && (
-          <WelcomePage onShowMovies={() => setRoute('movies')} />
-        )}
-        {route === 'movies' && <MoviesList movies={movies} />}
-      </main>
-    </div>
+    <main>
+      {route === "login" ? (
+        <LoginComp onLogin={handleLogin} />
+      ) : route === "welcome" ? (
+        <WelcomeComp onShowMovies={() => setRoute("movies")} />
+      ) : (
+        <MoviesListComp movies={movies} />
+      )}
+    </main>
   );
 }
 

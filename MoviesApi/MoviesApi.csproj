@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>11bb75a0-4522-4041-84c1-014c51020cca</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,14 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="14.6.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.8.6" />
+
+    <!-- Add Azure packages used by Program.cs (adjust versions if needed) -->
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <!-- Updated to resolved version to avoid NU1603 warning -->
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.1" />
+
+    <!-- JWT authentication middleware (provides Microsoft.AspNetCore.Authentication.JwtBearer) -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
   </ItemGroup>
 
 </Project>
