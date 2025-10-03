@@ -1,7 +1,7 @@
-import React, { useState } from "react"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Label } from "../components/ui/label"
+import React, { useState } from "react";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 
 import {
   Card,
@@ -10,43 +10,51 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../components/ui/card"
+} from "../components/ui/card";
+
+import { useAuth } from "../contexts/AuthProvider";
 
 export function LoginComp({
   onLogin,
 }: {
-  onLogin?: (u: string, p: string) => Promise<boolean>
+  onLogin?: (u: string, p: string) => Promise<boolean>;
 }) {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const auth = useAuth();
 
   async function submit(e?: React.FormEvent) {
-    e?.preventDefault()
-    setError(null)
+    e?.preventDefault();
+    setError(null);
 
     // basic validation
     if (!username.trim() || !password.trim()) {
-      setError("Username and password are required.")
-      return
+      setError("Username and password are required.");
+      return;
     }
 
-    if (username.trim().length < 3 || password.trim().length < 3) {
-      setError("Username and password must be at least 3 characters.")
-      return
-    }
-
-    if (onLogin) {
-      setLoading(true)
-      try {
-        const ok = await onLogin(username.trim(), password)
-        if (!ok) setError("Invalid credentials.")
-      } catch {
-        setError("Login request failed.")
-      } finally {
-        setLoading(false)
+    setLoading(true);
+    try {
+      const res = await auth.login(username.trim(), password);
+      if (!res.success) {
+        // show server response body / message visibly to the user
+        setError(res.message ?? "Invalid credentials or token request failed.");
+        return;
       }
+
+      // keep backwards-compatible optional parent callback (if present)
+      if (onLogin) {
+        try {
+          await onLogin(username.trim(), password);
+        } catch {
+          // ignore
+        }
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -92,20 +100,15 @@ export function LoginComp({
             </div>
           </div>
         </form>
-        {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
+        {error && <div className="mt-2 text-sm text-red-600" role="alert">{error}</div>}
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={loading}
-          onClick={submit}
-        >
+        <Button type="submit" className="w-full" disabled={loading} onClick={submit}>
           {loading ? "Signing in…" : "Login"}
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
 
-export default LoginComp
+export default LoginComp;

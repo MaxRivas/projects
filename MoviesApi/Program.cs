@@ -35,7 +35,7 @@ namespace MoviesApi
                 {
                     var credential = new DefaultAzureCredential();
                     // Key Vault provider is added last so Key Vault secrets override earlier sources
-                    ((IConfigurationBuilder)builder.Configuration).AddAzureKeyVault(new Uri(keyVaultUri), credential);
+                    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
                 }
                 catch
                 {
@@ -83,16 +83,29 @@ namespace MoviesApi
                 };
             });
 
-            builder.Services.AddAuthorization(options =>
+            // Register authorization policies.
+            // In Development do NOT apply a global FallbackPolicy so unauthenticated endpoints
+            // (like /Auth/token) can be called by the frontend/devtools.
+            if (builder.Environment.IsDevelopment())
             {
-                // Require authenticated user for all endpoints unless [AllowAnonymous] is used
-                options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
+                builder.Services.AddAuthorization(options =>
+                {
+                    // Do not set FallbackPolicy in development; register role policies as needed.
+                    options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+                });
+            }
+            else
+            {
+                builder.Services.AddAuthorization(options =>
+                {
+                    // Require authenticated user for all endpoints unless [AllowAnonymous] is used
+                    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                        .RequireAuthenticatedUser()
+                        .Build();
 
-                // Additional role-based policy example
-                options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
-            });
+                    options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+                });
+            }
 
             // CORS policy for the Vite dev server
             builder.Services.AddCors(options =>
