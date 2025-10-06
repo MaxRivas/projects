@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./App.css";
+import "./css/App.css";
 
 // Import namespaces to avoid assuming default export shape
 import * as LoginPageModule from "./pages/LoginPage";

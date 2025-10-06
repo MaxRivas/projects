@@ -1,5 +1,5 @@
 import type { MovieDto } from '../types/movie';
-import { DataTable } from '../types/dataTable';
+import { DataTable } from './dataTable';
 import {columns } from '../types/movie';
 
 type Props = {
