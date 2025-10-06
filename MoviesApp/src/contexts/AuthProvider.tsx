@@ -54,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }));
   const refreshTimer = useRef<number | null>(null);
 
+  // Minimal effect: do NOT auto-login. If a token already exists, schedule refresh.
   useEffect(() => {
     if (state.token) scheduleRefresh(state.token, state.refreshToken);
     return () => {
@@ -72,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState(s);
   }
 
-  function scheduleRefresh(token: string, refreshToken?: string | null) {
+  function scheduleRefresh(token: string, _refreshToken?: string | null) {
     if (refreshTimer.current) {
       window.clearTimeout(refreshTimer.current);
       refreshTimer.current = null;
@@ -86,10 +87,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshTimer.current = window.setTimeout(async () => {
       const ok = await refresh();
       if (!ok) logout();
-    }, ms);
+    }, ms) as unknown as number;
   }
 
-  async function requestTokenEndpoint(url: string, body: Record<string, unknown>): Promise<TokenResponse | { status: number; body?: any } | null> {
+  async function requestTokenEndpoint(
+    url: string,
+    body: Record<string, unknown>
+  ): Promise<TokenResponse | { status: number; body?: any } | null> {
     try {
       const res = await fetch(url, {
         method: "POST",
@@ -98,7 +102,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       const txt = await res.text();
       let json: any = null;
-      try { json = txt ? JSON.parse(txt) : null; } catch { json = txt; }
+      try {
+        json = txt ? JSON.parse(txt) : null;
+      } catch {
+        json = txt;
+      }
       if (res.ok) return json as TokenResponse;
       return { status: res.status, body: json };
     } catch (err) {
@@ -136,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { success: false, message: "Token request failed (no response)" };
   }
 
-  async function register(username: string, password: string) {
+  async function register(): Promise<boolean> {
     // similar to login; omitted for brevity
     return false;
   }
@@ -146,8 +154,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!rt) return false;
     const endpoints = ["/MoviesApi/Auth/refresh", "/Auth/refresh", "/refresh"];
     for (const ep of endpoints) {
-      const r = await requestTokenEndpoint(ep, { refresh_token: rt });ƒ
-      if (r && "access_token" in r) {
+      const r = await requestTokenEndpoint(ep, { refresh_token: rt });
+      if (r && typeof r === "object" && "access_token" in r) {
         const tokenResp = r as TokenResponse;
         persist({ token: tokenResp.access_token, refreshToken: tokenResp.refresh_token ?? null, user: state.user ?? null });
         scheduleRefresh(tokenResp.access_token, tokenResp.refresh_token ?? null);
@@ -168,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function authFetch(input: RequestInfo, init?: RequestInit) {
     const headers = new Headers(init?.headers ?? {});
     if (state.token) headers.set("Authorization", `Bearer ${state.token}`);
-    const res = await fetch(input, { ...init, headers });
+    const res = await fetch(input, { ...(init ?? {}), headers });
     // auto-logout on 401 response
     if (res.status === 401) {
       console.debug("AuthFetch received 401, logging out");
@@ -177,7 +185,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return res;
   }
 
-  const value = { ...state, login, logout, register, refresh, authFetch };
+  const value: AuthContextValue = {
+    token: state.token ?? null,
+    user: state.user ?? undefined,
+    login,
+    logout,
+    register,
+    refresh,
+    authFetch,
+  };
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

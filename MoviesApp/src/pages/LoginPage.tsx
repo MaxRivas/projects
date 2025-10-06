@@ -67,7 +67,7 @@ export function LoginComp({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={submit}>
+        <form>
           <div className="flex flex-col gap-2">
             <div className="grid gap-2">
               <Label htmlFor="username">User Name</Label>
