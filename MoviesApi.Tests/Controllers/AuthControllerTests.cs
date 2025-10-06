@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using MoviesApi.Controllers;
 using MoviesApi.Dto;
 using Xunit;
+using MoviesApi.Tests.Utilities;
 
 namespace MoviesApi.Controllers.Tests
 {
@@ -32,7 +34,7 @@ namespace MoviesApi.Controllers.Tests
         public void Token_Returns_Ok_With_AccessToken_For_Valid_Dev_Credentials()
         {
             var ctrl = CreateController();
-            var dto = new LoginDto { Username = "dev", Password = "dev" };
+            var dto = new LoginDto { Username = Constants.Dev, Password = Constants.Dev };
 
             var result = ctrl.Token(dto);
 

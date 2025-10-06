@@ -25,7 +25,7 @@ namespace MoviesApi.Dto.Tests
         [Fact]
         public void LoginDto_ValidDto_PassesValidation()
         {
-            var dto = new LoginDto { Username = "dev", Password = "dev" };
+            var dto = new LoginDto { Username = Constants.Dev, Password = Constants.Dev };
             var results = Helper.Validate(dto);
             Assert.Empty(results);
         }

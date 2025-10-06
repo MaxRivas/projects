@@ -1,6 +1,8 @@
 using System.Linq;
+using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore;
 using MoviesApi.Models;
+using MoviesApi.Tests.Utilities;
 using Xunit;
 
 namespace MoviesApi.Tests
@@ -28,17 +30,17 @@ namespace MoviesApi.Tests
             // Insert a movie into the in-memory store
             using (var context = new MovieContext(options))
             {
-                context.MovieItems.Add(new Movie { Title = "The Test Movie", Director = "Jane Developer", ReleaseYear = 2025, Genre = "Test" });
+                context.MovieItems.Add(new Movie { Title = Constants.TestMovieTitle, Director = Constants.TestMovieDirector, ReleaseYear = Constants.TestMovieReleaseYear, Genre = Constants.TestMovieGenre });
                 context.SaveChanges();
             }
 
             // Read the movie back using a separate context instance to simulate a different request/session
             using (var context = new MovieContext(options))
             {
-                var movie = context.MovieItems.FirstOrDefault(m => m.Title == "The Test Movie");
+                var movie = context.MovieItems.FirstOrDefault(m => m.Title == Constants.TestMovieTitle);
                 Assert.NotNull(movie);
-                Assert.Equal("Jane Developer", movie!.Director);
-                Assert.Equal(2025, movie.ReleaseYear);
+                Assert.Equal(Constants.TestMovieDirector, movie!.Director);
+                Assert.Equal(Constants.TestMovieReleaseYear, movie.ReleaseYear);
             }
         }
     }

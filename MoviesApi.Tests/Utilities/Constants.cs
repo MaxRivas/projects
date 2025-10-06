@@ -35,5 +35,7 @@ namespace MoviesApi.Tests.Utilities
         internal const string Other = "_other";
 
         internal const string NewTitle = "NewTitle";
+
+        internal const string Dev = "dev";
     }
 }
