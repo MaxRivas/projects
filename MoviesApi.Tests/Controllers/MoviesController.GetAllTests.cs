@@ -21,7 +21,7 @@ namespace MoviesApi.Controllers
         /// </summary>
         /// <returns>Empty list of MovieDto</returns>
         [Fact]
-        public async Task GetAll_ReturnsEmptyList()
+        public async Task MoviesController_GetAll_ReturnsEmptyList()
         {
             await using var ctx = CreateContext();
             var controller = CreateController(ctx);
@@ -36,7 +36,7 @@ namespace MoviesApi.Controllers
         /// </summary>
         /// <returns>List of all MovieDto</returns>
         [Fact]
-        public async Task GetAll_ReturnsAllMovies()
+        public async Task MoviesController_GetAll_ReturnsAllMovies()
         {
             await using var ctx = CreateContext();
             var movie1 = new Movie { Title = "GetAll1", Director = "D1", ReleaseYear = 2001, Genre = "Drama" };
@@ -57,7 +57,7 @@ namespace MoviesApi.Controllers
         /// Tests that GetAll maps Movie entities to MovieDto correctly.
         /// </summary>
         [Fact]
-        public async Task GetAll_MapsToMovieDtoProperly()
+        public async Task MoviesController_GetAll_MapsToMovieDtoProperly()
         {
             // Arrange
             await using var ctx = CreateContext();
@@ -84,7 +84,7 @@ namespace MoviesApi.Controllers
         /// Tests retrieval of all movies returning the inserted movies.
         /// </summary>
         [Fact]
-        public async Task GetAll_ReturnsInsertedMovies()
+        public async Task MoviesController_GetAll_ReturnsInsertedMovies()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var movie1 = Helper.ValidCreateMovieDto();
@@ -102,9 +102,9 @@ namespace MoviesApi.Controllers
             // Create two more distinct movies via helper to ensure list contains multiple entries
             var helperA = Helper.ValidCreateMovieDto();
             const string helperTitle = "HelperMovie_";
-            helperA.Title = helperTitle + Guid.NewGuid().ToString("N");
+            helperA.Title = helperTitle + Guid.NewGuid().ToString(Constants.N);
             var helperB = Helper.ValidCreateMovieDto();
-            helperB.Title = helperTitle + Guid.NewGuid().ToString("N");
+            helperB.Title = helperTitle + Guid.NewGuid().ToString(Constants.N);
             await CreateMovieAsync(client, helperA);
             await CreateMovieAsync(client, helperB);
 

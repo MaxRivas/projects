@@ -19,7 +19,7 @@ namespace MoviesApi.Controllers
         /// Tests patching a movie successfully.
         /// </summary> 
         [Fact]
-        public async Task Patch_Succeeds()
+        public async Task MoviesController_Patch_Succeeds()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -44,7 +44,7 @@ namespace MoviesApi.Controllers
         /// Tests that a PATCH request with no content returns a BadRequest.
         /// </summary>
         [Fact]
-        public async Task Patch_NoContent_ReturnsBadRequest()
+        public async Task MoviesController_Patch_NoContent_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var url = $"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}";
@@ -61,7 +61,7 @@ namespace MoviesApi.Controllers
         /// Tests that a PATCH request for a non-existent movie returns NotFound.
         /// </summary>
         [Fact]
-        public async Task Patch_NotFound_ReturnsNotFound()
+        public async Task MoviesController_Patch_NotFound_ReturnsNotFound()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var url = $"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}";
@@ -77,7 +77,7 @@ namespace MoviesApi.Controllers
         /// Tests that a PATCH request with invalid data returns BadRequest.
         /// </summary>
         [Fact]
-        public async Task Patch_EmptyTitle_ReturnsBadRequest()
+        public async Task MoviesController_Patch_EmptyTitle_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
@@ -94,7 +94,7 @@ namespace MoviesApi.Controllers
         /// Tests that a PATCH request with invalid data returns BadRequest.
         /// </summary> 
         [Fact]
-        public async Task Patch_EmptyDirector_ReturnsBadRequest()
+        public async Task MoviesController_Patch_EmptyDirector_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
@@ -111,13 +111,13 @@ namespace MoviesApi.Controllers
         /// Tests that a PATCH request with invalid data returns BadRequest.
         /// </summary>
         [Fact]
-        public async Task Patch_EmptyGenre_ReturnsBadRequest()
+        public async Task MoviesController_Patch_EmptyGenre_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
 
             var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
-            var patchObj = new { Genre = "" };
+            var patchObj = new { Genre = string.Empty };
             var content = JsonContent.Create(patchObj);
             var resp = await client.PatchAsync(updateEndpoint, content);
 
@@ -128,7 +128,7 @@ namespace MoviesApi.Controllers
         /// Tests that a PATCH request with invalid data returns BadRequest.
         /// </summary>
         [Fact]
-        public async Task Patch_InvalidReleaseYear_ReturnsBadRequest()
+        public async Task MoviesController_Patch_InvalidReleaseYear_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
@@ -145,12 +145,12 @@ namespace MoviesApi.Controllers
         /// Tests that a PATCH request causing a duplicate movie returns Conflict.
         /// </summary>
         [Fact]
-        public async Task Patch_Conflict_ReturnsConflict()
+        public async Task MoviesController_Patch_Conflict_ReturnsConflict()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var movieA = Helper.ValidCreateMovieDto();
             var movieB = Helper.ValidCreateMovieDto();
-            movieB.Title = movieB.Title + "_other";
+            movieB.Title = movieB.Title + Constants.Other; // make distinct initially
 
             var dtoA = await CreateMovieAsync(client, movieA);
             var dtoB = await CreateMovieAsync(client, movieB);
@@ -172,14 +172,13 @@ namespace MoviesApi.Controllers
         /// Tests that a valid PATCH request updates the movie and persists the changes.
         /// </summary>
         [Fact]
-        public async Task Patch_PartialUpdate_ReturnsNoContent_AndPersists()
+        public async Task MoviesController_Patch_PartialUpdate_ReturnsNoContent_AndPersists()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
             var created = await CreateMovieAsync(client, create);
-            const string newTitle = "NewTitle";
             var updateEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
-            var patchObj = new { Title = newTitle, ReleaseYear = 2022 };
+            var patchObj = new { Title = Constants.NewTitle, ReleaseYear = 2022 };
             var content = JsonContent.Create(patchObj);
             var resp = await client.PatchAsync(updateEndpoint, content);
 
@@ -187,7 +186,7 @@ namespace MoviesApi.Controllers
 
             var updated = await client.GetFromJsonAsync<MovieDto>(updateEndpoint);
             Assert.NotNull(updated);
-            Assert.Equal(newTitle, updated.Title);
+            Assert.Equal(Constants.NewTitle, updated.Title);
             Assert.Equal(2022, updated.ReleaseYear);
             Assert.Equal(create.Director, updated.Director);
             Assert.Equal(create.Genre, updated.Genre);

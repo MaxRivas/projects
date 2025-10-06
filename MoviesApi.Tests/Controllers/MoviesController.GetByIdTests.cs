@@ -19,7 +19,7 @@ namespace MoviesApi.Controllers
         /// Tests retrieval of a movie by ID returning NotFound for non-existent ID.
         /// </summary>
         [Fact]
-        public async Task GetById_NotFound()
+        public async Task MoviesController_GetById_NotFound()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var resp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}");
@@ -30,7 +30,7 @@ namespace MoviesApi.Controllers
         /// Tests retrieval of a movie by ID and verifies the returned data matches the created movie.
         /// </summary>
         [Fact]
-        public async Task GetById_Succeeds()
+        public async Task MoviesController_GetById_Succeeds()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();

@@ -16,11 +16,18 @@ using System.Text;
 
 namespace MoviesApi.Controllers
 {
+    /// <summary>
+    /// Edge-case integration tests for <see cref="MoviesApi.Controllers.MoviesController"/>.
+    /// These tests validate invalid input and non-existent resource behaviours.
+    /// They are intentionally minimal and rely on the same test-host pattern as other integration tests.
+    /// </summary>
     public partial class MoviesControllerTests : IClassFixture<WebApplicationFactory<Program>>
     {
         #region Private Fields
 
         private readonly WebApplicationFactory<Program> _baseFactory;
+
+        private static MoviesController CreateController(MovieContext context) => new(context);
 
         #endregion
 
@@ -32,10 +39,27 @@ namespace MoviesApi.Controllers
         /// <param name="baseFactory">The base factory.</param>
         public MoviesControllerTests(WebApplicationFactory<Program> baseFactory)
         {
-            _baseFactory = baseFactory;
+            // Use a unique in-memory DB name per test class to isolate state between runs.
+            var uniqueDbName = "EdgeCaseTest_MoviesDb_" + Guid.NewGuid().ToString(Constants.N);
+            _baseFactory = baseFactory.WithWebHostBuilder(builder =>
+            {
+                builder.UseSetting(Constants.InMemoryDbNameKey, uniqueDbName);
+
+                // Disable HTTPS redirect to reduce test log noise
+                builder.UseSetting(Constants.EnableHttpsRedirectKey, Constants.False);
+            });
+
+            // Ensure the in-memory database is created prior to running tests
+            using (var scope = _baseFactory.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<MovieContext>();
+                db.Database.EnsureCreated();
+            }
         }
 
         #endregion
+
+        #region Private Functions
 
         /// <summary>
         /// Creates a new factory for testing with a unique in-memory database.
@@ -84,16 +108,28 @@ namespace MoviesApi.Controllers
         /// <param name="client">HttpClient instance for making requests.</param>
         /// <param name="create">The movie creation DTO.</param>
         /// <returns>The created MovieDto.</returns>
-        private async Task<MovieDto> CreateMovieAsync(HttpClient client, CreateMovieDto create)
+        private static async Task<MovieDto> CreateMovieAsync(HttpClient client, CreateMovieDto create)
         {
             var resp = await client.PostAsJsonAsync(Constants.SlashMovies, create);
             resp.EnsureSuccessStatusCode();
-            var dto = await resp.Content.ReadFromJsonAsync<MovieDto>();
-            if (dto is null)
-            {
-                throw new InvalidOperationException("Failed to deserialize MovieDto from create response.");
-            }
+            var dto = await resp.Content.ReadFromJsonAsync<MovieDto>() ?? throw new InvalidOperationException("Failed to deserialize MovieDto from create response.");
             return dto;
         }
+
+        /// <summary>
+        /// Creates a new instance of the MovieContext for testing.
+        /// </summary>
+        /// <param name="dbName"></param>
+        /// <returns></returns>
+        private MovieContext CreateContext(string? dbName = null)
+        {
+            var options = new DbContextOptionsBuilder<MovieContext>()
+                .UseInMemoryDatabase(dbName ?? Guid.NewGuid().ToString())
+                .Options;
+
+            return new MovieContext(options);
+        }
+
+        #endregion
     }
 }

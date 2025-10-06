@@ -15,7 +15,7 @@ namespace MoviesApi.Controllers
         /// Tests that deleting an existing movie via the controller returns NoContent.
         /// </summary>
         [Fact]
-        public async Task Delete_Controller_NoContent()
+        public async Task MoviesController_Delete_Controller_NoContent()
         {
             // Arrange: create a fresh in-memory context and seed a movie
             var options = new DbContextOptionsBuilder<MovieContext>()
@@ -42,7 +42,7 @@ namespace MoviesApi.Controllers
         /// Tests that deleting a non-existent movie via the controller returns NotFound.
         /// </summary>
         [Fact]
-        public async Task Delete_Controller_NotFound()
+        public async Task MoviesController_Delete_Controller_NotFound()
         {
             // Arrange: use a fresh in-memory context with no movies
             var options = new DbContextOptionsBuilder<MovieContext>()
@@ -65,7 +65,7 @@ namespace MoviesApi.Controllers
         /// Tests update of a non-existent movie returning NotFound.
         /// </summary>
         [Fact]
-        public async Task Delete_Succeeds()
+        public async Task MoviesController_Delete_Succeeds()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -83,7 +83,7 @@ namespace MoviesApi.Controllers
         /// Tests deletion of a non-existent movie.
         /// </summary>
         [Fact]
-        public async Task Delete_NotFound_ReturnsNotFound()
+        public async Task MoviesController_Delete_NotFound_ReturnsNotFound()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var resp = await client.DeleteAsync($"{Constants.SlashMovies}{Constants.Slash}{Constants.ReleaseYearMax}");

@@ -13,63 +13,18 @@ using Xunit;
 using MoviesApi.Tests.Utilities;
 using static System.Net.HttpStatusCode;
 
-namespace MoviesApi.Tests.Controllers
-{
-    /// <summary>
-    /// Edge-case integration tests for <see cref="MoviesApi.Controllers.MoviesController"/>.
-    /// These tests validate invalid input and non-existent resource behaviours.
-    /// They are intentionally minimal and rely on the same test-host pattern as other integration tests.
-    /// </summary>
-    public class MoviesControllerEdgeCasesTests : IClassFixture<WebApplicationFactory<MoviesApi.Program>>
+namespace MoviesApi.Controllers
+{   
+    public partial class MoviesControllerTests
     {
-        #region Private Fields
-
-        private readonly WebApplicationFactory<MoviesApi.Program> _factory;
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Constructor that sets up a test host with a unique in-memory database for isolation.
-        /// This ensures tests do not interfere with each other's state.
-        /// The database is created fresh for each test class instance.
-        /// The in-memory database name is randomized using a GUID to avoid collisions.
-        /// HTTPS redirection is disabled to reduce log noise during tests.
-        /// The environment is set to Development to keep Swagger/OpenAPI available if needed.
-        /// The database is ensured to be created before any tests run. 
-        /// </summary>
-        /// <param name="factory"></param>
-        public MoviesControllerEdgeCasesTests(WebApplicationFactory<MoviesApi.Program> factory)
-        {
-            // Use a unique in-memory DB name per test class to isolate state between runs.
-            var uniqueDbName = "EdgeCaseTest_MoviesDb_" + Guid.NewGuid().ToString(Constants.N);
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.UseSetting(Constants.InMemoryDbNameKey, uniqueDbName);
-
-                // Disable HTTPS redirect to reduce test log noise
-                builder.UseSetting(Constants.EnableHttpsRedirectKey, Constants.False);
-            });
-
-            // Ensure the in-memory database is created prior to running tests
-            using (var scope = _factory.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<MovieContext>();
-                db.Database.EnsureCreated();
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// Sending an invalid movie model (required fields missing or out-of-range) should return BadRequest.
         /// This asserts model validation is wired and that controller responds with 400 for invalid payloads.
         /// </summary>
         [Fact]
-        public async Task Create_InvalidModel_ReturnsBadRequest()
+        public async Task MoviesController_Create_InvalidModel_ReturnsBadRequest()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
             // Create payload intentionally invalid: empty strings and too-small ReleaseYear
             var newMovie = new CreateMovieDto
@@ -89,9 +44,9 @@ namespace MoviesApi.Tests.Controllers
         /// Verifies controller handles missing resources gracefully.
         /// </summary>
         [Fact]
-        public async Task Update_Nonexistent_ReturnsNotFound()
+        public async Task MoviesController_Update_Nonexistent_ReturnsNotFound()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
             var newMovie = Helper.ValidUpdateMovieDto();
 
             var response = await client.PutAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{newMovie.Id}", newMovie);
@@ -99,35 +54,16 @@ namespace MoviesApi.Tests.Controllers
         }
 
         /// <summary>
-        /// Patching with an invalid ReleaseYear should return BadRequest; controller validates fields provided in Patch DTO.
-        /// </summary>
-        [Fact]
-        public async Task Patch_InvalidReleaseYear_ReturnsBadRequest()
-        {
-            var client = _factory.CreateClient();
-
-            // Create a valid movie first, then attempt an invalid partial update
-            var newMovie = Helper.ValidUpdateMovieDto();
-            var response = await client.PostAsJsonAsync(Constants.SlashMovies, newMovie);
-            var created = await response.Content.ReadFromJsonAsync<MovieDto>();
-            Assert.NotNull(created);
-
-            var patch = new PatchMovieDto { ReleaseYear = 1400 };
-            response = await client.PatchAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created.Id}", patch);
-            Assert.Equal(BadRequest, response.StatusCode);
-        }
-
-        /// <summary>
         /// Create a movie with boundary values (very long title and lower ReleaseYear bound) to exercise edge conditions.
         /// </summary>
         [Fact]
-        public async Task Create_BoundaryValues_Succeeds()
+        public async Task MoviesController_Create_BoundaryValues_Succeeds()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
             // ReleaseYear lower bound and long title
-            var releaseYear = 1888;// ReleaseYear lower bound and long title
-            var longTitle = new string('A', 512);
+            var releaseYear = Constants.ReleaseYearMin;// ReleaseYear lower bound and long title
+            var longTitle = Helper.MakeString(512);
             var newMovie = new CreateMovieDto
             {
                 Title = longTitle,
@@ -149,9 +85,9 @@ namespace MoviesApi.Tests.Controllers
         /// Patch should only update the fields provided in the Patch DTO and leave other fields unchanged.
         /// </summary>
         [Fact]
-        public async Task Patch_PartialUpdate_OnlyUpdatesSpecifiedFields()
+        public async Task MoviesController_Patch_PartialUpdate_OnlyUpdatesSpecifiedFields()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
             // Create an initial movie
             var newMovie = Helper.ValidUpdateMovieDto();
@@ -161,15 +97,14 @@ namespace MoviesApi.Tests.Controllers
             Assert.NotNull(created);
 
             // Patch only the Title
-            var newTitle = "Updating the Title only";
             string patchEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{created.Id}";
-            var patch = new PatchMovieDto { Title = newTitle };
+            var patch = new PatchMovieDto { Title = Constants.NewTitle };
             var patchResp = await client.PatchAsJsonAsync(patchEndpoint, patch);
             Assert.Equal(NoContent, patchResp.StatusCode);
 
             var response = await client.GetFromJsonAsync<MovieDto>(patchEndpoint);
             Assert.NotNull(response);
-            Assert.Equal(newTitle, response.Title);
+            Assert.Equal(Constants.NewTitle, response.Title);
             Assert.Equal(Constants.TestMovieDirector, response.Director); // unchanged
         }
 
@@ -177,9 +112,9 @@ namespace MoviesApi.Tests.Controllers
         /// Re-assert invalid patch handling with different bad year to ensure validation is consistent.
         /// </summary>
         [Fact]
-        public async Task Patch_InvalidReleaseYear_ReturnsBadRequest_DifferentCase()
+        public async Task MoviesController_Patch_InvalidReleaseYear_ReturnsBadRequest_DifferentCase()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
             // Create an initial movie
             var newMovie = Helper.ValidCreateMovieDto();
@@ -198,9 +133,9 @@ namespace MoviesApi.Tests.Controllers
         /// This is a duplicate of Update_Nonexistent_ReturnsNotFound but kept for clarity.
         /// </summary>  
         [Fact]
-        public async Task Update_NonExistentMovie_ReturnsNotFound()
+        public async Task MoviesController_Update_NonExistentMovie_ReturnsNotFound()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
             // Create an initial movie
             var newMovie = Helper.ValidUpdateMovieDto();
@@ -210,29 +145,12 @@ namespace MoviesApi.Tests.Controllers
         }
 
         /// <summary>
-        /// Creating a duplicate movie (same Title+Director+ReleaseYear) should return 409 Conflict.
-        /// </summary>
-        [Fact]
-        public async Task Create_Duplicate_ReturnsConflict()
-        {
-            var client = _factory.CreateClient();
-
-            var create = Helper.ValidCreateMovieDto();
-            var first = await client.PostAsJsonAsync(Constants.SlashMovies, create);
-            Assert.Equal(Created, first.StatusCode);
-
-            // Attempt to create the same movie again
-            var second = await client.PostAsJsonAsync(Constants.SlashMovies, create);
-            Assert.Equal(Conflict, second.StatusCode);
-        }
-
-        /// <summary>
         /// Patching a movie so it duplicates another movie should return 409 Conflict.
         /// </summary>
         [Fact]
-        public async Task Patch_ToDuplicate_ReturnsConflict()
+        public async Task MoviesController_Patch_ToDuplicate_ReturnsConflict()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
             // Create movie A
             var createA = Helper.ValidCreateMovieDto();
@@ -261,10 +179,10 @@ namespace MoviesApi.Tests.Controllers
         /// Prefill should be idempotent: calling it multiple times should not create duplicates.
         /// </summary>
         [Fact]
-        public async Task Prefill_Idempotent()
+        public async Task MoviesController_Prefill_Idempotent()
         {
-            var client = _factory.CreateClient();
-            const string prefillEndpoint = $"{Constants.SlashMovies}{Constants.Slash}Prefill";
+            var client = _baseFactory.CreateClient();
+            const string prefillEndpoint = $"{Constants.SlashMovies}{Constants.Slash}{Constants.Prefill}";
 
             var r1 = await client.GetAsync(prefillEndpoint);
             Assert.Equal(System.Net.HttpStatusCode.OK, r1.StatusCode);
@@ -281,34 +199,12 @@ namespace MoviesApi.Tests.Controllers
         }
 
         /// <summary>
-        /// When the id in the route does not match the id in the body, the API should return BadRequest.
-        /// </summary>
-        [Fact]
-        public async Task Update_IdMismatch_ReturnsBadRequest()
-        {
-            var client = _factory.CreateClient();
-
-            // Create an initial movie to have a valid id
-            var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, Helper.ValidCreateMovieDto());
-            createResp.EnsureSuccessStatusCode();
-            var created = await createResp.Content.ReadFromJsonAsync<MovieDto>();
-            Assert.NotNull(created);
-
-            var update = Helper.ValidUpdateMovieDto();
-            update.Id = created.Id; // body id matches created id
-
-            // Call PUT with a different id in the route
-            var badPut = await client.PutAsJsonAsync($"{Constants.SlashMovies}{Constants.Slash}{created.Id + 1}", update);
-            Assert.Equal(BadRequest, badPut.StatusCode);
-        }
-
-        /// <summary>
         /// Duplicate detection should be case-insensitive.
         /// </summary>
         [Fact]
-        public async Task Create_Duplicate_CaseInsensitive_ReturnsConflict()
+        public async Task MoviesController_Create_Duplicate_CaseInsensitive_ReturnsConflict()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
 
             var first = new CreateMovieDto
@@ -336,9 +232,9 @@ namespace MoviesApi.Tests.Controllers
         /// Sending a JSON literal null for PATCH should return BadRequest (patch==null).
         /// </summary>
         [Fact]
-        public async Task Patch_NullBody_ReturnsBadRequest()
+        public async Task MoviesController_Patch_NullBody_ReturnsBadRequest()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
             // Create a movie to patch
             var createResp = await client.PostAsJsonAsync(Constants.SlashMovies, Helper.ValidCreateMovieDto());

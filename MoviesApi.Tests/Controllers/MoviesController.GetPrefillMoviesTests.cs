@@ -14,35 +14,12 @@ namespace MoviesApi.Controllers
 {
     public partial class MoviesControllerTests
     {
-        #region Private Fields
-
-        private MoviesController CreateController(MovieContext ctx) => new MoviesController(ctx);
-
-        #endregion
-
-        #region Private Methods
-
-        /// <summary>
-        /// Creates a new instance of the MovieContext for testing.
-        /// </summary>
-        /// <param name="dbName"></param>
-        /// <returns></returns>
-        private MovieContext CreateContext(string dbName = null)
-        {
-            var options = new DbContextOptionsBuilder<MovieContext>()
-                .UseInMemoryDatabase(dbName ?? Guid.NewGuid().ToString())
-                .Options;
-
-            return new MovieContext(options);
-        }
-
-        #endregion
 
         /// <summary>
         /// Tests pre-filling the database with initial movie data and verifies movies are added.
         /// </summary>
         [Fact]
-        public async Task Prefill_AddsMovies()
+        public async Task MoviesController_Prefill_AddsMovies()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var resp = await client.GetAsync($"{Constants.SlashMovies}{Constants.Slash}{Constants.Prefill}");
@@ -57,18 +34,12 @@ namespace MoviesApi.Controllers
         /// Tests that {Constants.Prefill} skips adding duplicate movies if they already exist.
         /// </summary>
         [Fact]
-        public async Task Prefill_SkipsDuplicates_WhenSampleAlreadyExists()
+        public async Task MoviesController_Prefill_SkipsDuplicates_WhenSampleAlreadyExists()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
 
             // Insert a movie matching what the {Constants.Prefill} generator would create for Sample Movie 1
-            var preExisting = new CreateMovieDto
-            {
-                Title = "Sample Movie 1",
-                Director = "Director 1",
-                ReleaseYear = 2001,
-                Genre = "Drama"
-            };
+            var preExisting = Helper.ValidCreateMovieDto();
             var created = await CreateMovieAsync(client, preExisting);
             Assert.NotNull(created);
 

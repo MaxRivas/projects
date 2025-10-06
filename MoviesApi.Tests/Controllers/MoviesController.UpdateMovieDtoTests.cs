@@ -18,7 +18,7 @@ namespace MoviesApi.Controllers
         /// Tests successful update of a movie and verifies changes are persisted.
         /// </summary>
         [Fact]
-        public async Task Update_Succeeds()
+        public async Task MoviesController_Update_Succeeds()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var movieDto = Helper.ValidCreateMovieDto();
@@ -45,14 +45,14 @@ namespace MoviesApi.Controllers
         /// Tests update of a non-existent movie causing a conflict.
         /// </summary>
         [Fact]
-        public async Task Update_Conflict_ReturnsConflict()
+        public async Task MoviesController_Update_Conflict_ReturnsConflict()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var movie1 = Helper.ValidCreateMovieDto();
             var movie2 = Helper.ValidCreateMovieDto();
 
             // Make movie2 distinct so CreateMovieAsync does not return Conflict when inserting
-            movie2.Title = movie2.Title + "_other";
+            movie2.Title = movie2.Title + Constants.Other;
 
             var movieDto1 = await CreateMovieAsync(client, movie1);
             var movieDto2 = await CreateMovieAsync(client, movie2);
@@ -73,7 +73,7 @@ namespace MoviesApi.Controllers
         /// Tests update with ID mismatch returning BadRequest.
         /// </summary>
         [Fact]
-        public async Task Update_IdMismatch_ReturnsBadRequest()
+        public async Task MoviesController_Update_IdMismatch_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var created = await CreateMovieAsync(client, Helper.ValidCreateMovieDto());
@@ -89,10 +89,10 @@ namespace MoviesApi.Controllers
         /// Tests update of a non-existent movie.
         /// </summary>
         [Fact]
-        public async Task Update_NotFound_ReturnsNotFound()
+        public async Task MoviesController_Update_NotFound_ReturnsNotFound()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
-            var updateId = 99999;
+            var updateId = Constants.ReleaseYearMax + 1; // ID that won't exist
             var update = Helper.ValidUpdateMovieDto();
             update.Id = updateId;
 

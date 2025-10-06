@@ -26,15 +26,14 @@ namespace MoviesApi.Tests.Utilities
 
         internal const string TestMovieGenre = "Test Movie Genre";
 
-        internal const string TestDbPrefix = "Test_MoviesDb_";
-
         internal const string False = "false";
 
-        internal const string EnvironmentKey = "environment";
-
-        internal const string Development = "Development";
-
         internal const string Patch = "PATCH";
+
         internal const string Prefill = "Prefill";
+
+        internal const string Other = "_other";
+
+        internal const string NewTitle = "NewTitle";
     }
 }

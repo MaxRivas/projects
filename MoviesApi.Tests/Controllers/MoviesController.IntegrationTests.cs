@@ -11,57 +11,22 @@ using Xunit;
 using MoviesApi.Tests.Utilities;
 using static System.Net.HttpStatusCode;
 
-namespace MoviesApi.Tests.Controllers
+namespace MoviesApi.Controllers
 {
     /// <summary>
     /// Integration tests for <see cref="MoviesApi.Controllers.MoviesController"/> using WebApplicationFactory.
     /// These tests exercise the HTTP endpoints end-to-end against the in-memory EF Core provider.
     /// </summary>
-    public class MoviesControllerIntegrationTests : IClassFixture<WebApplicationFactory<MoviesApi.Program>>
+    public partial class MoviesControllerTests
     {
-        #region Private Fields
-
-        private readonly WebApplicationFactory<MoviesApi.Program> _factory;
-
-        #endregion
-
-        #region Constructor
-        /// <summary>
-        /// Constructor that sets up a test host with a unique in-memory database for isolation.
-        /// This ensures tests do not interfere with each other's state.
-        /// The database is created fresh for each test class instance.
-        /// </summary>
-        public MoviesControllerIntegrationTests(WebApplicationFactory<MoviesApi.Program> factory)
-        {
-            // Create a factory that sets an override InMemoryDbName so the app will use that DB instance
-            var uniqueDbName = "IntegrationTest_MoviesDb_" + Guid.NewGuid().ToString(Constants.N);
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.UseSetting(Constants.InMemoryDbNameKey, uniqueDbName);
-                // Disable HTTPS redirect during tests to avoid "Failed to determine the https port for redirect" log noise
-                builder.UseSetting(Constants.EnableHttpsRedirectKey, Constants.False);
-                // Ensure environment is Development so swagger remains enabled if needed
-                builder.UseSetting(Constants.EnvironmentKey, Constants.Development);
-            });
-
-            // Ensure the database is created for the actual test server's service provider
-            using (var scope = _factory.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<MovieContext>();
-                db.Database.EnsureCreated();
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// Full CRUD flow smoke test: Create -> List -> Get -> Update -> Delete.
         /// Ensures endpoints return expected status codes and persisted values.
         /// </summary>
         [Fact]
-        public async Task CrudFlow_Works()
+        public async Task MoviesController_CrudFlow_Works()
         {
-            var client = _factory.CreateClient();
+            var client = _baseFactory.CreateClient();
 
             // Create a new movie via POST
             var create = Helper.ValidCreateMovieDto();

@@ -60,5 +60,13 @@ namespace MoviesApi.Tests.Utilities
             Validator.TryValidateObject(model, context, results, validateAllProperties: true);
             return results;
         }
+
+        /// <summary>
+        /// Generates a string of specified length consisting of repeated 'x' characters.
+        /// </summary>
+        /// <param name="length">The length of the string to generate.</param>
+        /// <returns>A string of the specified length.</returns>
+        internal static string MakeString(int length) => new(Constants.N.ToCharArray()[0], length);
+
     }
 }

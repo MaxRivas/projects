@@ -22,7 +22,7 @@ namespace MoviesApi.Controllers
         /// Tests the creation of a movie.
         /// </summary>
         [Fact]
-        public async Task Create_ReturnsCreatedAndLocation()
+        public async Task MoviesController_Create_ReturnsCreatedAndLocation()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -41,7 +41,7 @@ namespace MoviesApi.Controllers
         /// Tests the creation of a duplicate movie returning Conflict.
         /// </summary>
         [Fact]
-        public async Task Create_Duplicate_ReturnsConflict()
+        public async Task MoviesController_Create_Duplicate_ReturnsConflict()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -57,7 +57,7 @@ namespace MoviesApi.Controllers
         /// Tests the creation of a movie and verifies it is persisted.
         /// </summary>
         [Fact]
-        public async Task Create_Success_ReturnsCreatedAndPersists()
+        public async Task MoviesController_Create_Success_ReturnsCreatedAndPersists()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -84,7 +84,7 @@ namespace MoviesApi.Controllers
         /// Tests the creation of a movie with invalid genre data returning BadRequest.
         /// </summary>
         [Fact]
-        public async Task Create_InvalidGenre_ReturnsBadRequest()
+        public async Task MoviesController_Create_InvalidGenre_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -99,7 +99,7 @@ namespace MoviesApi.Controllers
         /// Tests the creation of a movie with invalid title data returning BadRequest.
         /// </summary>
         [Fact]
-        public async Task Create_InvalidTitle_ReturnsBadRequest()
+        public async Task MoviesController_Create_InvalidTitle_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -114,7 +114,7 @@ namespace MoviesApi.Controllers
         /// Tests the creation of a movie with invalid director data returning BadRequest.
         /// </summary>
         [Fact]
-        public async Task Create_InvalidDirector_ReturnsBadRequest()
+        public async Task MoviesController_Create_InvalidDirector_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -129,7 +129,7 @@ namespace MoviesApi.Controllers
         /// Tests the creation of a movie with invalid release date data returning BadRequest.
         /// </summary>
         [Fact]
-        public async Task Create_InvalidReleaseDate_ReturnsBadRequest()
+        public async Task MoviesController_Create_InvalidReleaseDate_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var create = Helper.ValidCreateMovieDto();
@@ -144,7 +144,7 @@ namespace MoviesApi.Controllers
         /// Tests the creation of a movie with invalid release date data returning BadRequest.
         /// </summary>
         [Fact]
-        public async Task Create_InvalidParameters_ReturnsBadRequest()
+        public async Task MoviesController_Create_InvalidParameters_ReturnsBadRequest()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             // Build an intentionally invalid payload (missing required fields / out-of-range year)
@@ -159,7 +159,7 @@ namespace MoviesApi.Controllers
         /// Tests creation of a case-insensitive duplicate movie.
         /// </summary>
         [Fact]
-        public async Task Create_CaseInsensitiveDuplicate_ReturnsConflict()
+        public async Task MoviesController_Create_CaseInsensitiveDuplicate_ReturnsConflict()
         {
             var client = CreateClient(Guid.NewGuid().ToString());
             var baseCreate = Helper.ValidCreateMovieDto();
