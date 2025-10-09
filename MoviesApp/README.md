@@ -2,18 +2,45 @@
 
 This small package provides a JSON-backed organizer for movies (title, genre, release date, director).
 
-Quick start
+Quick start (backend + frontend)
+
+Backend (.NET 8):
+
+```bash
+cd server
+dotnet build
+dotnet run
+# API listens on http://localhost:5000 by default
+```
+
+Frontend (Vite + React):
+
+```bash
+cd app
+npm install
+npm run dev
+```
+
+Seeded DB
+
+The repository includes a seeded `data/movies.db` for local development. To recreate or reseed:
+
+```bash
+python3 scripts/seed_sqlite.py
+```
+
+Tests
+
+Python unit tests for the small local CLI/library live under `tests/`. To run them:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pytest -q
+PYTHONPATH=src .venv/bin/pytest -q
 ```
 
-CLI example
+CI
 
-```bash
-python -m movies_app.cli add --title "Inception" --genre "Sci-Fi" --release-date 2010-07-16 --director Nolan
-python -m movies_app.cli list
-```
+There is a GitHub Actions workflow at `.github/workflows/ci.yml` that builds the server (.NET 8) and builds the frontend.
+
