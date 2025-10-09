@@ -28,6 +28,9 @@ data/
 datasets/
 models/
 
+# Allow the seeded development DB for MoviesApp
+!/MoviesApp/data/movies.db
+
 # Specific large file types
 # These are common file extensions for large data and model files
 *.bin
