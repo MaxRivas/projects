@@ -1,6 +1,6 @@
 import pytest
 
-from src.main import addition
+from src.addition import addition
 
 # Test cases for integer numbers
 def test_positive_integernumbers():
