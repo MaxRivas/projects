@@ -5,9 +5,12 @@
  */
 ////////////////////////////////////////////////////////////////////////////
 
-#include <../inc/Account.h>
+#include <Account.h>
+#include <../inc/interfaces/IAccount.h>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <memory>
 
 using namespace testing;
 using bank::Account;
@@ -25,16 +28,15 @@ protected:
     {
         // Code here will be called immediately after each test (right
         // before the destructor).
-        delete _account;
     }
 
-    bank::Account *_account;
+    std::unique_ptr<bank::IAccount> _account;
 };
 
 TEST_F(Bank_Account_Tests, Test_Account_Creation_Checking)
 {
     double initial_balance = 1000.0;
-    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance);
     EXPECT_EQ(_account->getAccountType(), bank::AccountType::CHECKING);
     EXPECT_EQ(_account->getBalance(), initial_balance);
 }
@@ -42,7 +44,7 @@ TEST_F(Bank_Account_Tests, Test_Account_Creation_Checking)
 TEST_F(Bank_Account_Tests, Test_Account_Creation_Savings)
 {
     double initial_balance = 500.0;
-    _account = new bank::Account(bank::AccountType::SAVINGS, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance);
     EXPECT_EQ(_account->getAccountType(), bank::AccountType::SAVINGS);
     EXPECT_EQ(_account->getBalance(), initial_balance);
 }
@@ -50,7 +52,7 @@ TEST_F(Bank_Account_Tests, Test_Account_Creation_Savings)
 TEST_F(Bank_Account_Tests, Test_Account_Creation_Negative_Balance)
 {
     double initial_balance = -100.0;
-    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance);
 
     // Assuming that the account should not be created with negative balance
     EXPECT_EQ(_account->getBalance(), 0.0);
@@ -59,7 +61,7 @@ TEST_F(Bank_Account_Tests, Test_Account_Creation_Negative_Balance)
 TEST_F(Bank_Account_Tests, Test_Account_Creation_Zero_Balance)
 {
     double initial_balance = 0.0;
-    _account = new bank::Account(bank::AccountType::SAVINGS, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance);
 
     // Assuming that the account should not be created with zero balance
     EXPECT_EQ(_account->getBalance(), 0.0);
@@ -68,7 +70,7 @@ TEST_F(Bank_Account_Tests, Test_Account_Creation_Zero_Balance)
 TEST_F(Bank_Account_Tests, Test_Deposit_Positive_Amount)
 {
     double initial_balance = 200.0;
-    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance);
 
     double deposit_amount = 150.0;
     bool result = _account->deposit(deposit_amount);
@@ -80,7 +82,7 @@ TEST_F(Bank_Account_Tests, Test_Deposit_Positive_Amount)
 TEST_F(Bank_Account_Tests, Test_Deposit_Negative_Amount)
 {
     double initial_balance = 300.0;
-    _account = new bank::Account(bank::AccountType::SAVINGS, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance);
 
     double deposit_amount = -50.0;
     bool result = _account->deposit(deposit_amount);
@@ -92,7 +94,7 @@ TEST_F(Bank_Account_Tests, Test_Deposit_Negative_Amount)
 TEST_F(Bank_Account_Tests, Test_Deposit_Zero_Amount)
 {
     double initial_balance = 400.0;
-    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance);
 
     double deposit_amount = 0.0;
     bool result = _account->deposit(deposit_amount);
@@ -104,7 +106,7 @@ TEST_F(Bank_Account_Tests, Test_Deposit_Zero_Amount)
 TEST_F(Bank_Account_Tests, Test_Withdraw_Positive_Amount)
 {
     double initial_balance = 500.0;
-    _account = new bank::Account(bank::AccountType::SAVINGS, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance);
 
     double withdraw_amount = 200.0;
     bool result = _account->withdraw(withdraw_amount);
@@ -116,7 +118,7 @@ TEST_F(Bank_Account_Tests, Test_Withdraw_Positive_Amount)
 TEST_F(Bank_Account_Tests, Test_Withdraw_Amount_Exceeding_Balance)
 {
     double initial_balance = 600.0;
-    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance);
 
     double withdraw_amount = 700.0;
     bool result = _account->withdraw(withdraw_amount);
@@ -128,7 +130,7 @@ TEST_F(Bank_Account_Tests, Test_Withdraw_Amount_Exceeding_Balance)
 TEST_F(Bank_Account_Tests, Test_Withdraw_Negative_Amount)
 {
     double initial_balance = 800.0;
-    _account = new bank::Account(bank::AccountType::SAVINGS, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance);
 
     double withdraw_amount = -100.0;
     bool result = _account->withdraw(withdraw_amount);
@@ -140,7 +142,7 @@ TEST_F(Bank_Account_Tests, Test_Withdraw_Negative_Amount)
 TEST_F(Bank_Account_Tests, Test_Withdraw_Zero_Amount)
 {
     double initial_balance = 900.0;
-    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance);
 
     double withdraw_amount = 0.0;
     bool result = _account->withdraw(withdraw_amount);
@@ -152,7 +154,7 @@ TEST_F(Bank_Account_Tests, Test_Withdraw_Zero_Amount)
 TEST_F(Bank_Account_Tests, Test_Withdraw_Exact_Balance)
 {
     double initial_balance = 1000.0;
-    _account = new bank::Account(bank::AccountType::SAVINGS, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance);
 
     double withdraw_amount = initial_balance;
     bool result = _account->withdraw(withdraw_amount);
@@ -164,7 +166,7 @@ TEST_F(Bank_Account_Tests, Test_Withdraw_Exact_Balance)
 TEST_F(Bank_Account_Tests, Test_Multiple_Deposits_And_Withdrawals)
 {
     double initial_balance = 1000.0;
-    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
+    _account = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance);
 
     EXPECT_TRUE(_account->deposit(500.0));
     EXPECT_EQ(_account->getBalance(), 1500.0);
@@ -179,12 +181,16 @@ TEST_F(Bank_Account_Tests, Test_Multiple_Deposits_And_Withdrawals)
     EXPECT_EQ(_account->getBalance(), 1600.0);
 }
 
-TEST_F(Bank_Account_Tests, Test_GetId_Uniqueness)
+TEST_F(Bank_Account_Tests, Test_GetId_Unique_Per_Account)
 {
-    double initial_balance = 100.0;
+    double initial_balance1 = 100.0;
+    double initial_balance2 = 200.0;
 
-    bank::Account account1(bank::AccountType::CHECKING, initial_balance);
-    bank::Account account2(bank::AccountType::SAVINGS, initial_balance);
+    auto account1 = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance1);
+    auto account2 = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance2);
 
-    EXPECT_NE(account1.getId(), account2.getId());
+    int id1 = account1->getId();
+    int id2 = account2->getId();
+
+    EXPECT_NE(id1, id2);
 }

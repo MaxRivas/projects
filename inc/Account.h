@@ -9,10 +9,10 @@
  */
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <AccountType.h>
+#include <interfaces/IAccount.h>
 
 namespace bank {
-    class Account
+    class Account : public bank::IAccount
     {
         private:
             int id;
@@ -22,11 +22,11 @@ namespace bank {
 
         public:
             Account(AccountType type, double balance);
-            AccountType getAccountType() const;
-            double getBalance() const;
-            bool deposit(double amount);
-            bool withdraw(double amount);
-            int getId() const;
+            AccountType getAccountType() const override;
+            double getBalance() const override;
+            bool deposit(double amount) override;
+            bool withdraw(double amount) override;
+            int getId() const override;
     };
 }
 

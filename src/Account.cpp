@@ -18,11 +18,12 @@ namespace bank {
         if (balance > MIN_INITIAL_BALANCE) {
             _accountType = type;
             _balance = balance;
+            id = -1;
         } else
         {   
             _accountType = type;
             _balance = 0.0;
-            id = bank::generateRandomId();
+            id = bank::generateUniqueId();
         }
     }
 
@@ -57,7 +58,7 @@ namespace bank {
 
         return result;
     }
-    
+
     int Account::getId() const
     {
         return id;

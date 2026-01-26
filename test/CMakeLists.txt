@@ -14,7 +14,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-file(GLOB UNIT_TEST_SOURCES "src/*.cpp")
+file(GLOB UNIT_TEST_SOURCES "src/*.cpp" "Inc/*.cpp")
 add_executable(${PROJECT_NAME} ${UNIT_TEST_SOURCES})
 
 if(APPLE)
@@ -25,7 +25,7 @@ else()
     target_link_options(${PROJECT_NAME} PRIVATE -coverage -lgcov)
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../inc)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../inc ${CMAKE_CURRENT_SOURCE_DIR}/Inc)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest_main gmock_main pthread banklib)
 
