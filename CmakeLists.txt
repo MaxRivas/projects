@@ -1,14 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-project(bank VERSION 0.1.0)
+project(bank VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Workaround for macOS Makefile dependency tracking issue
-set(CMAKE_MAKE_PROGRAM /usr/bin/make)
-if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments -fcolor-diagnostics")
-endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/inc)
 
