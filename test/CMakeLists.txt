@@ -59,11 +59,12 @@ target_include_directories(${TARGET_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../inc
 )
 
-# Link GoogleTest + pthread
+# Link GoogleTest + pthread + banklib
 target_link_libraries(${TARGET_NAME} PRIVATE
     gtest_main
     gmock_main
     pthread
+    banklib
 )
 # Link your main project library
 add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME})
