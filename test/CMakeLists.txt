@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 
 set(TARGET_NAME bank_test)
 project(${TARGET_NAME} VERSION 1.0 LANGUAGES CXX)
@@ -65,5 +65,10 @@ target_link_libraries(${TARGET_NAME} PRIVATE
     gmock_main
     pthread
 )
-
+# Link your main project library
 add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME})
+
+# Add this for better CTest integration:
+set_tests_properties(${TARGET_NAME} PROPERTIES
+    LABELS "unit"
+)
