@@ -7,3 +7,5 @@ include_directories(src inc)
 
 add_subdirectory(src)
 add_subdirectory(test)
+
+include(CTest)
