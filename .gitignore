@@ -1,66 +1,79 @@
-# Prerequisites
-*.d
+.gitignore for CMake C++ Project with GoogleTest
 
-# Compiled Object files
-*.slo
-*.lo
+# Build directories
+build/
+Build/
+cmake-build-*/
+out/
+
+# Test binaries
+*_test
+*.test
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+CTestTestfile.cmake
+
+# Compiled objects
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
+*.a
+*.lib
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
 *.exe
-*.out
-*.app
 
-# CMake files
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
+# FetchContent downloads
+_deps/
+googletest-src/
+googletest-build/
+googletest-subbuild/
 
-# default build
-build/
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.user
+*.pro.user
 
-# Anything build...
-[Bb][Uu][Ii][Ll][Dd]/
+# Dependencies
+third_party/
+external/
+vendor/
 
-# default bin
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.bak
+*.backup
+
+# LLVM/Clang coverage files
+*.profraw
+*.profdata
+
+# Build artifacts
 bin/
+build/
+out/
 
-# Anything bin...
-[Bb][Ii][Nn]/
+# CMake-generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
 
-# ignore googletest items
-test/googletest-*/
-
-# ignore the test executable
-test/calculator_test
-
-# vscode settings
-.vscode
+# Test coverage temp files (Linux/GCC)
+*.gcno
+*.gcda
+*.gcov

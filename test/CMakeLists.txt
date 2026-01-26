@@ -1,49 +1,69 @@
 cmake_minimum_required(VERSION 3.9)
 
+set(TARGET_NAME bank_test)
+project(${TARGET_NAME} VERSION 1.0 LANGUAGES CXX)
+
+
+# C++ standard (target-based is possible, but this is fine globally)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(This bank_test)
-project(${This} CXX)
-
 include(FetchContent)
 
-set(FETCHCONTENT_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-
+# Fetch latest stable GoogleTest
 FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        v1.17.0
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.17.0
 )
-
 FetchContent_MakeAvailable(googletest)
-
-set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -coverage -fprofile-arcs -ftest-coverage")
-set(GCC_COVERAGE_LINK_FLAGS "-coverage -lgcov")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
 
 enable_testing()
 
-include_directories(
-    "../inc"
-    )
-
-# Some recommendations on NOT using file globbing to grab all cpp files.  So far, it seems
-# ok, so rolling with it until we get more experience.
-
-#"mocks/*.cpp",
+# Collect test sources
 file(GLOB UNIT_TEST_SOURCES
     "*.cpp"
 )
 
-add_executable(${This} ${UNIT_TEST_SOURCES})
+add_executable(${TARGET_NAME} ${UNIT_TEST_SOURCES})
 
-target_link_libraries(${This} PUBLIC	
+# Coverage flags applied ONLY to this target
+if(APPLE)
+    target_compile_options(${TARGET_NAME} PRIVATE
+        -fprofile-instr-generate
+        -fcoverage-mapping
+    )
+
+    target_link_options(${TARGET_NAME} PRIVATE
+        -fprofile-instr-generate
+        -fcoverage-mapping
+    )
+else()
+    target_compile_options(${TARGET_NAME} PRIVATE
+        -g
+        -O0
+        -coverage
+        -fprofile-arcs
+        -ftest-coverage
+    )
+
+    target_link_options(${TARGET_NAME} PRIVATE
+        -coverage
+        -lgcov
+    )
+endif()
+
+
+# Include your project headers
+target_include_directories(${TARGET_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../inc
+)
+
+# Link GoogleTest + pthread
+target_link_libraries(${TARGET_NAME} PRIVATE
     gtest_main
     gmock_main
-    gtest
-    gmock
     pthread
 )
+
+add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME})
