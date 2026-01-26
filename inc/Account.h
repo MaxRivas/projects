@@ -12,13 +12,17 @@
 #include <AccountType.h>
 
 namespace bank {
-    class Account{
+    class Account
+    {
         private:
+            constexpr static double MIN_INITIAL_BALANCE = 0.0;
+            double _balance = MIN_INITIAL_BALANCE;
             AccountType _accountType;
 
         public:
-            Account(AccountType type);
+            Account(AccountType type, double balance);
             AccountType getAccountType() const;
+            double getBalance() const;
     };
 }
 

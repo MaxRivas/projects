@@ -33,12 +33,34 @@ protected:
 
 TEST_F(Bank_Account_Tests, Test_Account_Creation_Checking)
 {
-    _account = new bank::Account(bank::AccountType::CHECKING);
+    double initial_balance = 1000.0;
+    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
     EXPECT_EQ(_account->getAccountType(), bank::AccountType::CHECKING);
+    EXPECT_EQ(_account->getBalance(), initial_balance);
 }
 
 TEST_F(Bank_Account_Tests, Test_Account_Creation_Savings)
 {
-    _account = new bank::Account(bank::AccountType::SAVINGS);
+    double initial_balance = 500.0;
+    _account = new bank::Account(bank::AccountType::SAVINGS, initial_balance);
     EXPECT_EQ(_account->getAccountType(), bank::AccountType::SAVINGS);
+    EXPECT_EQ(_account->getBalance(), initial_balance);
+}
+
+TEST_F(Bank_Account_Tests, Test_Account_Creation_Negative_Balance)
+{
+    double initial_balance = -100.0;
+    _account = new bank::Account(bank::AccountType::CHECKING, initial_balance);
+
+    // Assuming that the account should not be created with negative balance
+    EXPECT_EQ(_account->getBalance(), 0.0);
+}
+
+TEST_F(Bank_Account_Tests, Test_Account_Creation_Zero_Balance)
+{
+    double initial_balance = 0.0;
+    _account = new bank::Account(bank::AccountType::SAVINGS, initial_balance);
+
+    // Assuming that the account should not be created with zero balance
+    EXPECT_EQ(_account->getBalance(), 0.0);
 }
