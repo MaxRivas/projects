@@ -5,11 +5,12 @@
  */
 ////////////////////////////////////////////////////////////////////////////
 
-#include <Account.h>
+#include <../inc/Account.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 using namespace testing;
+using bank::Account;
 
 class Bank_Account_Tests : public Test
 {
@@ -27,17 +28,17 @@ protected:
         delete _account;
     }
 
-    Account *_account;
+    bank::Account *_account;
 };
 
 TEST_F(Bank_Account_Tests, Test_Account_Creation_Checking)
 {
-    _account = new Account(CHECKING);
-    EXPECT_EQ(_account->getAccountType(), CHECKING);
+    _account = new bank::Account(bank::AccountType::CHECKING);
+    EXPECT_EQ(_account->getAccountType(), bank::AccountType::CHECKING);
 }
 
 TEST_F(Bank_Account_Tests, Test_Account_Creation_Savings)
 {
-    _account = new Account(SAVINGS);
-    EXPECT_EQ(_account->getAccountType(), SAVINGS);
+    _account = new bank::Account(bank::AccountType::SAVINGS);
+    EXPECT_EQ(_account->getAccountType(), bank::AccountType::SAVINGS);
 }

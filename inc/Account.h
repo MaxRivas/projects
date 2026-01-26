@@ -1,3 +1,6 @@
+#ifndef ACCOUNT_H
+#define ACCOUNT_H
+
 ///////////////////////////////////////////////////////////////////////////////
 /**
  * @file  Account.h
@@ -6,18 +9,17 @@
  */
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef ACCOUNT_H
-#define ACCOUNT_H
+#include <AccountType.h>
 
-#include <AccountTypes.h>
+namespace bank {
+    class Account{
+        private:
+            AccountType _accountType;
 
-class Account{
-    private:
-        AccountTypes _accountType;
-
-    public:
-        Account(AccountTypes type): _accountType(type) {};
-        AccountTypes getAccountType() const { return _accountType; }
-};
+        public:
+            Account(AccountType type);
+            AccountType getAccountType() const;
+    };
+}
 
 #endif  // ACCOUNT_H

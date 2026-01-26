@@ -7,7 +7,7 @@ This is a C++ banking application project with comprehensive unit testing using 
 ```
 .
 ├── inc/                 # Header files
-│   └── AccountTypes.h
+│   └── accountType.h
 ├── src/                 # Source files
 │   ├── main.cpp
 │   └── CMakeLists.txt
