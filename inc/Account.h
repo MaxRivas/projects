@@ -15,6 +15,7 @@ namespace bank {
     class Account
     {
         private:
+            int id;
             constexpr static double MIN_INITIAL_BALANCE = 0.0;
             double _balance = MIN_INITIAL_BALANCE;
             AccountType _accountType;
@@ -25,6 +26,7 @@ namespace bank {
             double getBalance() const;
             bool deposit(double amount);
             bool withdraw(double amount);
+            int getId() const;
     };
 }
 

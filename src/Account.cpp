@@ -7,6 +7,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <Account.h>
+#include <IdGenerator.h>
+
 
 namespace bank {
 
@@ -20,6 +22,7 @@ namespace bank {
         {   
             _accountType = type;
             _balance = 0.0;
+            id = bank::generateRandomId();
         }
     }
 
@@ -53,5 +56,10 @@ namespace bank {
         }
 
         return result;
+    }
+    
+    int Account::getId() const
+    {
+        return id;
     }
 }

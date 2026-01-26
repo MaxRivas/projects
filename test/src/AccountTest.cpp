@@ -178,3 +178,13 @@ TEST_F(Bank_Account_Tests, Test_Multiple_Deposits_And_Withdrawals)
     EXPECT_TRUE(_account->deposit(300.0));
     EXPECT_EQ(_account->getBalance(), 1600.0);
 }
+
+TEST_F(Bank_Account_Tests, Test_GetId_Uniqueness)
+{
+    double initial_balance = 100.0;
+
+    bank::Account account1(bank::AccountType::CHECKING, initial_balance);
+    bank::Account account2(bank::AccountType::SAVINGS, initial_balance);
+
+    EXPECT_NE(account1.getId(), account2.getId());
+}
