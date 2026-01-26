@@ -22,7 +22,7 @@ enable_testing()
 
 # Collect test sources
 file(GLOB UNIT_TEST_SOURCES
-    "*.cpp"
+    "src/*.cpp"
 )
 
 add_executable(${TARGET_NAME} ${UNIT_TEST_SOURCES})

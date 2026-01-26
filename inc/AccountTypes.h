@@ -1,21 +1,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 /**
- * @file  Calculator.h
- * @date  Fri, 16 April 2021
- * @brief 
+ * @file  AccountTypes.h
+ * @brief specifies different types of bank accounts.
  * 
  */
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef ACCOUNT_TYPE_H
-#define ACCOUNT_TYPE_H
+#ifndef ACCOUNT_TYPES_H
+#define ACCOUNT_TYPES_H
 
 #include <iostream>
 // Add your function declarations here.
 
-enum AccountType {
+enum AccountTypes {
     CHECKING,
     SAVINGS
 };
 
-#endif  // ACCOUNT_TYPE_H
+#endif  // ACCOUNT_TYPES_H
