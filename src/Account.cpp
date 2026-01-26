@@ -32,4 +32,26 @@ namespace bank {
     {
         return _balance;
     }
+
+    bool Account::deposit(double amount)
+    {
+        bool result = false;
+        if (amount > MIN_INITIAL_BALANCE) {
+            _balance += amount;
+            result = true;
+        }
+
+        return result;
+    }
+
+    bool Account::withdraw(double amount)
+    {
+        bool result = false;
+        if (amount > MIN_INITIAL_BALANCE && amount <= _balance) {
+            _balance -= amount;
+            result = true;
+        }
+
+        return result;
+    }
 }

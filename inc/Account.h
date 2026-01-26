@@ -23,6 +23,8 @@ namespace bank {
             Account(AccountType type, double balance);
             AccountType getAccountType() const;
             double getBalance() const;
+            bool deposit(double amount);
+            bool withdraw(double amount);
     };
 }
 
