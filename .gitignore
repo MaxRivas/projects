@@ -5,6 +5,9 @@ build/
 Build/
 cmake-build-*/
 out/
+/CMakeFiles/
+/CTestTestfile.cmake
+/DartConfiguration.tcl
 
 # Test binaries
 *_test
