@@ -20,6 +20,9 @@ namespace bank {
             virtual bool deposit(double amount) = 0;
             virtual bool withdraw(double amount) = 0;
             virtual int getId() const = 0;
+            virtual bool isValid() const = 0;
+            virtual bool closeAccount(int& accountId) = 0;
+            virtual ~IAccount() = default;
     };
 }
 

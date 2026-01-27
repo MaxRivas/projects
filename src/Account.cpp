@@ -7,7 +7,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <Account.h>
-#include <IdGenerator.h>
+#include <Utilities.h>
+#include <Constants.h>
 
 
 namespace bank {
@@ -15,15 +16,15 @@ namespace bank {
     
     Account::Account(AccountType type, double balance)
     {
-        if (balance > MIN_INITIAL_BALANCE) {
+        if (balance > Constants::MIN_BALANCE)
+        {
             _accountType = type;
             _balance = balance;
-            id = -1;
-        } else
-        {   
-            _accountType = type;
-            _balance = 0.0;
-            id = bank::generateUniqueId();
+            id = Constants::INVALID_ID;
+        }
+        else
+        {
+            invalidateMembers();
         }
     }
 
@@ -40,7 +41,7 @@ namespace bank {
     bool Account::deposit(double amount)
     {
         bool result = false;
-        if (amount > MIN_INITIAL_BALANCE) {
+        if (amount > Constants::MIN_BALANCE) {
             _balance += amount;
             result = true;
         }
@@ -51,7 +52,7 @@ namespace bank {
     bool Account::withdraw(double amount)
     {
         bool result = false;
-        if (amount > MIN_INITIAL_BALANCE && amount <= _balance) {
+        if (amount > Constants::MIN_BALANCE && amount <= _balance) {
             _balance -= amount;
             result = true;
         }
@@ -62,5 +63,28 @@ namespace bank {
     int Account::getId() const
     {
         return id;
+    }
+
+    bool Account::isValid() const
+    {
+        return _accountType != bank::AccountType::INVALID;
+    }
+
+    bool Account::closeAccount(int& accountId)
+    {
+        bool result = false;
+        if (isValid() && accountId == id)
+        {
+            invalidateMembers();
+            result = true;
+        }
+        return result;
+    }
+
+    void Account::invalidateMembers()
+    {
+        _accountType = bank::AccountType::INVALID;
+        _balance = Constants::MIN_BALANCE;
+        id = bank::Utilities::generateUniqueId();
     }
 }

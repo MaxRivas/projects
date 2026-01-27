@@ -16,17 +16,22 @@ namespace bank {
     {
         private:
             int id;
-            constexpr static double MIN_INITIAL_BALANCE = 0.0;
-            double _balance = MIN_INITIAL_BALANCE;
+            double _balance;
             AccountType _accountType;
+
+            void invalidateMembers();
 
         public:
             Account(AccountType type, double balance);
+            void InvalidateMembers();
             AccountType getAccountType() const override;
             double getBalance() const override;
             bool deposit(double amount) override;
             bool withdraw(double amount) override;
             int getId() const override;
+            bool isValid() const override;
+            bool closeAccount(int& accountId) override;
+            ~Account() = default;
     };
 }
 

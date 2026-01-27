@@ -1,0 +1,26 @@
+///////////////////////////////////////////////////////////////////////////////
+/**
+ * @file  Constants.h
+ * @brief defines constants used in the bank application
+ *
+ */
+///////////////////////////////////////////////////////////////////////////////
+
+#include <string>
+
+namespace bank {
+    struct Constants
+    {
+        constexpr static double MIN_BALANCE = 0.0;
+        constexpr static int INVALID_ID = -1;
+        constexpr static int MIN_DISTRIBUTION = 100;
+        constexpr static int MAX_DISTRIBUTION = 999;
+        constexpr static int MODULE_GENERATOR = 1000000000;
+        constexpr static char WHITESPACE_CHAR = ' ';
+        constexpr static char DASH_CHAR = '-';
+        constexpr static char APOSTROPHE_CHAR = '\'';
+        constexpr static int INVALID_AGE = 0;
+        static constexpr std::string_view EMPTY_STRING = "";
+    };
+    
+}

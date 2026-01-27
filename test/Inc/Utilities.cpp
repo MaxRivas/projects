@@ -1,11 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////
 /**
- *  @file   IdGeneratorTest.cpp
- *  @brief  Unit tests for IdGenerator class
+ *  @file   UtilitiesTest.cpp
+ *  @brief  Unit tests for Utilities class
  */
 ////////////////////////////////////////////////////////////////////////////
 
-#include <IdGenerator.h>
+#include <Utilities.h>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -15,9 +15,9 @@ using namespace testing;
 
 TEST(Bank_IdGenerator_Tests, Test_GenerateUniqueId_Multiple_Calls)
 {
-    int id1 = bank::generateUniqueId();
-    int id2 = bank::generateUniqueId();
-    int id3 = bank::generateUniqueId();
+    int id1 = bank::Utilities::generateUniqueId();
+    int id2 = bank::Utilities::generateUniqueId();
+    int id3 = bank::Utilities::generateUniqueId();
 
     EXPECT_NE(id1, id2);
     EXPECT_NE(id1, id3);
@@ -27,7 +27,7 @@ TEST(Bank_IdGenerator_Tests, Test_GenerateUniqueId_Multiple_Calls)
 TEST(Bank_IdGenerator_Tests, Test_GenerateUniqueId_Range)
 {
     for (int i = 0; i < 100; ++i) {
-        int id = bank::generateUniqueId();
+        int id = bank::Utilities::generateUniqueId();
         EXPECT_GE(id, 100000000); // Minimum expected value
         EXPECT_LE(id, 1000999998); // Maximum expected value
     }
@@ -39,7 +39,7 @@ TEST(Bank_IdGenerator_Tests, Test_GenerateUniqueId_Performance)
     std::set<int> ids;
 
     for (int i = 0; i < numIds; ++i) {
-        int id = bank::generateUniqueId();
+        int id = bank::Utilities::generateUniqueId();
         ids.insert(id);
     }
 

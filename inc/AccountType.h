@@ -16,7 +16,8 @@
 namespace bank {
     enum AccountType {
         CHECKING,
-        SAVINGS
+        SAVINGS,
+        INVALID
     };
 }
 

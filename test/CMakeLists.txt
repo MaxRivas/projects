@@ -13,8 +13,8 @@ FetchContent_Declare(googletest
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-
-file(GLOB UNIT_TEST_SOURCES "src/*.cpp" "Inc/*.cpp")
+# Automatically collect all test source files
+file(GLOB UNIT_TEST_SOURCES CONFIGURE_DEPENDS "src/*.cpp" "Inc/*.cpp")
 add_executable(${PROJECT_NAME} ${UNIT_TEST_SOURCES})
 
 if(APPLE)
