@@ -9,7 +9,6 @@
  *////////////////////////////////////////////////////////////////////////////
 #include <interfaces/IPerson.h>
 
-#include <vector>
 
 namespace bank
 {
@@ -19,16 +18,12 @@ namespace bank
             int id;
             int _age;
             std::string _name;
-            std::vector<std::shared_ptr<IAccount>> _accounts;
 
         public:
             Person(const std::string &name, int age);
             std::string getName() const override;
             int getAge() const override;
             int getId() const override;
-            bool addAccount(std::unique_ptr<IAccount> account) override;
-            bool removeAccount(int accountId) override;
-            const std::vector<std::shared_ptr<const IAccount>> getAccounts() const override;
     };
 }
 

@@ -18,12 +18,10 @@ namespace bank {
             int id;
             double _balance;
             AccountType _accountType;
-
             void invalidateMembers();
 
         public:
             Account(AccountType type, double balance);
-            void InvalidateMembers();
             AccountType getAccountType() const override;
             double getBalance() const override;
             bool deposit(double amount) override;

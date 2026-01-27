@@ -23,9 +23,6 @@ namespace bank
         virtual std::string getName() const = 0;
         virtual int getAge() const = 0;
         virtual int getId() const = 0;
-        virtual bool addAccount(std::unique_ptr<IAccount> account) = 0;
-        virtual bool removeAccount(int accountId) = 0;
-        virtual const std::vector<std::shared_ptr<const IAccount>> getAccounts() const = 0;
     };
 }
 
