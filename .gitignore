@@ -13,6 +13,12 @@ out/
 *_test
 *.test
 
+# Other files
+*.txt
+*.log
+*.out
+*.log
+
 # CMake files
 CMakeCache.txt
 CMakeFiles/
@@ -43,7 +49,6 @@ googletest-subbuild/
 *.swp
 *.swo
 *~
-.DS_Store
 *.user
 *.pro.user
 
