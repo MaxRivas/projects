@@ -9,11 +9,12 @@
  */
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <AccountType.h>
-#include <interfaces/IAccount.h>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <AccountType.h>
+#include <interfaces/IAccount.h>
 
 namespace bank
 {

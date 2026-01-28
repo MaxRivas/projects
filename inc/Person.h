@@ -7,8 +7,8 @@
  * @brief specifies a person.
  *
  *////////////////////////////////////////////////////////////////////////////
-#include <interfaces/IPerson.h>
 
+ #include <interfaces/IPerson.h>
 
 namespace bank
 {

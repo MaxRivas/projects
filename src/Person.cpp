@@ -6,9 +6,9 @@
  */
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <Constants.h>
 #include <Person.h>
 #include <Utilities.h>
-#include <Constants.h>
 
 namespace bank {
     Person::Person(const std::string &name, int age)

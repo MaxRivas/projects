@@ -10,8 +10,8 @@
 #include <chrono>
 #include <random>
 
-#include "Utilities.h"
 #include "Constants.h"
+#include "Utilities.h"
 
 namespace bank {
 

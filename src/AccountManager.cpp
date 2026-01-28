@@ -10,7 +10,6 @@
 
 namespace bank {
 
-
     bool AccountManager::addAccount(std::unique_ptr<IAccount> account)
     {
         bool result = false;
@@ -96,3 +95,4 @@ namespace bank {
         return isValidAccount && isDifferentAccounts && isValidAmount;
     }
 }
+
