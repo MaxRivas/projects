@@ -268,3 +268,57 @@ TEST_F(Bank_AccountManager_Tests, BillPayment_AccountNotFound)
 {
     EXPECT_FALSE(_accountManager->billPayment(RANDOM_ACCOUNT_ID, ONE_HUNDRED)); // Assuming RANDOM_ACCOUNT_ID is an invalid ID
 }
+
+TEST_F(Bank_AccountManager_Tests, BillPayment_InvalidAccount)
+{
+    auto account = Bank_AccountManager_Tests::createInvalidAccount();
+    bool added = _accountManager->addAccount(std::move(account));
+    EXPECT_FALSE(added);
+
+    auto accounts = _accountManager->getAccounts();
+    EXPECT_TRUE(accounts.empty());
+}
+
+/**
+ *  Test cases for Card Purchase 
+ * */
+TEST_F(Bank_AccountManager_Tests, CardPurchase_Success)
+{
+    auto account = Bank_AccountManager_Tests::createCheckingAccount(FIVE_HUNDRED);
+    _accountManager->addAccount(std::move(account));
+
+    auto accounts = _accountManager->getAccounts();
+    int accountId = accounts[0]->getId();
+
+    EXPECT_TRUE(_accountManager->cardPurchase(accountId, ONE_HUNDRED));
+    EXPECT_FLOAT_EQ(accounts[0]->getBalance(), 400.0);
+}
+
+TEST_F(Bank_AccountManager_Tests, CardPurchase_InvalidAmount)
+{
+    auto account = Bank_AccountManager_Tests::createCheckingAccount(FIVE_HUNDRED);
+    _accountManager->addAccount(std::move(account));
+
+    auto accounts = _accountManager->getAccounts();
+    int accountId = accounts[0]->getId();
+
+    EXPECT_FALSE(_accountManager->cardPurchase(accountId, MINUS_FIFTY)); // Invalid amount
+    EXPECT_FLOAT_EQ(accounts[0]->getBalance(), FIVE_HUNDRED);  // Balance should remain unchanged
+}
+
+TEST_F(Bank_AccountManager_Tests, CardPurchase_InsufficientFunds)
+{
+    auto account = Bank_AccountManager_Tests::createCheckingAccount(FIVE_HUNDRED);
+    _accountManager->addAccount(std::move(account));
+
+    auto accounts = _accountManager->getAccounts();
+    int accountId = accounts[0]->getId();
+
+    EXPECT_FALSE(_accountManager->cardPurchase(accountId, 600.0)); // Insufficient funds
+    EXPECT_FLOAT_EQ(accounts[0]->getBalance(), FIVE_HUNDRED);  // Balance should remain unchanged
+}
+
+TEST_F(Bank_AccountManager_Tests, CardPurchase_AccountNotFound)
+{
+    EXPECT_FALSE(_accountManager->cardPurchase(RANDOM_ACCOUNT_ID, ONE_HUNDRED)); // Assuming RANDOM_ACCOUNT_ID is an invalid ID
+}

@@ -75,6 +75,42 @@ namespace bank {
         return result;
     }
 
+    bool AccountManager::billPayment(const int &accountId, const double &amount)
+    {
+        bool result = false;
+        auto accountIt = getAccountById(accountId);
+
+        if (accountIt != _accounts.end() && isAmountValid(amount))
+        {
+            auto &account = *accountIt;
+            if (account->getBalance() > amount)
+            {
+                account->withdraw(amount);
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
+    bool AccountManager::cardPurchase(const int &accountId, const double &amount)
+    {
+        bool result = false;
+        auto accountIt = getAccountById(accountId);
+
+        if (accountIt != _accounts.end() && isAmountValid(amount))
+        {
+            auto &account = *accountIt;
+            if (account->getBalance() > amount)
+            {
+                account->withdraw(amount);
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
     bool AccountManager::validateInputs(const int& sourceAccount, const int& targetAccount, const double &amount) const
     {
         bool result = false;
@@ -84,23 +120,6 @@ namespace bank {
         bool isValidAmount = isAmountValid(amount);
 
         return isValidAccount && areDifferentAccounts && isValidAmount;
-    }
-
-    bool AccountManager::billPayment(const int& accountId, const double& amount)
-    {
-        bool result = false;
-        auto accountIt = getAccountById(accountId);
-
-        if (accountIt != _accounts.end() && isAmountValid(amount))
-        {
-            auto &account = *accountIt;
-            if (account->getBalance() > amount) {
-                account->withdraw(amount);
-                result = true;
-            }
-        }
-
-        return result;
     }
 
     std::vector<std::shared_ptr<IAccount>>::const_iterator AccountManager::getAccountById(int accountId) const

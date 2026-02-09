@@ -31,7 +31,7 @@ namespace bank {
             virtual const std::vector<std::shared_ptr<const IAccount>> getAccounts() const override;
             virtual bool transferFunds(const int& sourceAccount, const int& targetAccount, const double &amount) override;
             virtual bool billPayment(const int& accountId, const double& amount)override;
-            //virtual bool cardPurchase(const int &accountId, const double &amount) override;
+            virtual bool cardPurchase(const int &accountId, const double &amount) override;
             virtual ~AccountManager() = default;
     };
 }
