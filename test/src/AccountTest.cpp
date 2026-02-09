@@ -224,7 +224,7 @@ TEST_F(Bank_Account_Tests, Test_CloseAccount_InvalidId)
     double initial_balance = 100.0;
     _account = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance);
 
-    int invalidAccountId = _account->getId() + 1; // Assuming this ID does not exist
+    int invalidAccountId = -13; // Assuming this ID does not exist
     EXPECT_FALSE(_account->closeAccount(invalidAccountId));
     EXPECT_TRUE(_account->isValid());
 }

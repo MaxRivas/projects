@@ -6,6 +6,7 @@
  */
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <Constants.h>
 #include <AccountManager.h>
 
 namespace bank {
@@ -13,27 +14,25 @@ namespace bank {
     bool AccountManager::addAccount(std::unique_ptr<IAccount> account)
     {
         bool result = false;
-        if (account)
+        if (account && account->isValid())
         {
             _accounts.push_back(std::move(account));
             result = true;
         }
+
         return result;
     }
 
     bool AccountManager::removeAccount(int accountId)
     {
         bool result = false;
-        auto iterator = std::remove_if(_accounts.begin(), _accounts.end(),
-                                       [accountId](const std::shared_ptr<IAccount> &account)
-                                       {
-                                           return account->getId() == accountId;
-                                       });
-        if (iterator != _accounts.end())
+        auto account = getAccountById(accountId);
+        if (account != _accounts.end())
         {
-            _accounts.erase(iterator, _accounts.end());
+            _accounts.erase(account);
             result = true;
         }
+
         return result;
     }
 
@@ -44,10 +43,11 @@ namespace bank {
         {
             result.push_back(account);
         }
+        
         return result;
     }
 
-    bool AccountManager::transferFunds(const AccountType &sourceAccount, const AccountType &targetAccount, const double &amount)
+    bool AccountManager::transferFunds(const int& sourceAccount, const int& targetAccount, const double &amount)
     {
         bool result = false;
 
@@ -55,17 +55,8 @@ namespace bank {
         {
             
             // Find source and destination accounts
-            auto sourceIt = std::find_if(_accounts.begin(), _accounts.end(),
-                                        [sourceAccount](const std::shared_ptr<IAccount> &account)
-                                        {
-                                            return account->getAccountType() == sourceAccount;
-                                        });
-
-            auto destinationIt = std::find_if(_accounts.begin(), _accounts.end(),
-                                            [targetAccount](const std::shared_ptr<IAccount> &account)
-                                            {
-                                                return account->getAccountType() == targetAccount;
-                                            });
+            auto sourceIt = getAccountById(sourceAccount);
+            auto destinationIt = getAccountById(targetAccount);
 
             // Perform transfer if both accounts are found
             if (sourceIt != _accounts.end() && destinationIt != _accounts.end())
@@ -84,15 +75,45 @@ namespace bank {
         return result;
     }
 
-    bool AccountManager::validateInputs(const AccountType &sourceAccount, const AccountType &targetAccount, const double &amount) const
+    bool AccountManager::validateInputs(const int& sourceAccount, const int& targetAccount, const double &amount) const
     {
         bool result = false;
-        bool isValidAccount (sourceAccount != AccountType::INVALID &&
-                            targetAccount != AccountType::INVALID);
-        bool isDifferentAccounts (sourceAccount != targetAccount);
-        bool isValidAmount (amount > 0.0);
+        bool isValidAccount (sourceAccount > Constants::INVALID_ZERO &&
+                            targetAccount > Constants::INVALID_ZERO);
+        bool areDifferentAccounts (sourceAccount != targetAccount);
+        bool isValidAmount = isAmountValid(amount);
 
-        return isValidAccount && isDifferentAccounts && isValidAmount;
+        return isValidAccount && areDifferentAccounts && isValidAmount;
+    }
+
+    bool AccountManager::billPayment(const int& accountId, const double& amount)
+    {
+        bool result = false;
+        auto accountIt = getAccountById(accountId);
+
+        if (accountIt != _accounts.end() && isAmountValid(amount))
+        {
+            auto &account = *accountIt;
+            if (account->getBalance() > amount) {
+                account->withdraw(amount);
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
+    std::vector<std::shared_ptr<IAccount>>::const_iterator AccountManager::getAccountById(int accountId) const
+    {
+        return std::find_if(_accounts.begin(), _accounts.end(),
+                            [accountId](const std::shared_ptr<IAccount> &account)
+                            {
+                                return account->getId() == accountId;
+                            });
+    }
+
+    bool AccountManager::isAmountValid(const double &amount) const
+    {
+        return amount > Constants::MIN_BALANCE;
     }
 }
-

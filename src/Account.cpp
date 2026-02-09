@@ -19,7 +19,7 @@ namespace bank {
         {
             _accountType = type;
             _balance = balance;
-            id = Constants::INVALID_ID;
+            id = bank::Utilities::generateUniqueId();
         }
         else
         {
@@ -84,6 +84,6 @@ namespace bank {
     {
         _accountType = bank::AccountType::INVALID;
         _balance = Constants::MIN_BALANCE;
-        id = bank::Utilities::generateUniqueId();
+        id = Constants::INVALID_ID;
     }
 }

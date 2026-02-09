@@ -7,8 +7,8 @@
  */
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <chrono>
-#include <random>
+#include <atomic>
+#include <cstdint>
 
 #include "Constants.h"
 #include "Utilities.h"
@@ -17,10 +17,8 @@ namespace bank {
 
     int Utilities::generateUniqueId()
     {
-        static std::mt19937 gen(std::random_device{}());
-        std::uniform_int_distribution<> dist(Constants::MIN_DISTRIBUTION, Constants::MAX_DISTRIBUTION);
-        auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-        return static_cast<int>((now % Constants::MODULE_GENERATOR) + dist(gen));
+        static std::atomic_uint32_t counter{1};
+        return static_cast<int>(counter.fetch_add(1, std::memory_order_relaxed));
     }
 
     bool Utilities::isValidName(const std::string &name)
