@@ -1,0 +1,22 @@
+{
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.configureOnOpen": true,
+
+    // Optional: CMake Tools will auto-select the best generator
+    "cmake.generator": "Unix Makefiles",
+
+    // Required for IntelliSense to match CMake's configuration
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+
+    // Optional but helpful
+    "C_Cpp.codeAnalysis.runAutomatically": true,
+
+    // Ensures Test Explorer integrates with CTest
+    "cmake.testPreset": "default",
+
+    // Ensures CMake Tools registers tests with VS Code Test Explorer
+    "cmake.ctestArgs": [
+        "--output-on-failure"
+    ]
+}
