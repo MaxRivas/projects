@@ -15,7 +15,7 @@
 
 namespace bank
 {
-    class Person : public bank::IPerson
+    class Person : public virtual bank::IPerson
     {
         private:
             int id;

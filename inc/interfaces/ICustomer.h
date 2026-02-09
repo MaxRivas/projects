@@ -14,7 +14,7 @@
 
 namespace bank
 {
-    class ICustomer : public bank::IPerson
+    class ICustomer : public virtual bank::IPerson
     {
         private:
             bank::RelationshipTier _tier;

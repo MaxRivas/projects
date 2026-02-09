@@ -11,7 +11,8 @@
 
 namespace bank{
 
-    Customer::Customer(const bank::RelationshipTier &tier)
+    Customer::Customer(const bank::RelationshipTier &tier, const std::string &name, const int &age)
+     : Person(name, age), _accountManager(nullptr)
     {
         _tier = tier;
     }

@@ -25,6 +25,7 @@ namespace bank {
             virtual bool transferFunds(const int& sourceAccount, const int& targetAccount, const double &amount) = 0;
             virtual bool billPayment(const int& accountId, const double& amount) = 0;
             virtual bool cardPurchase(const int &accountId, const double &amount) = 0;
+            virtual ~IAccountManager() = default;
     };
 }
 #endif  // IACCOUNT_MANAGER_H
