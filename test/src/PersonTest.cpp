@@ -59,3 +59,16 @@ TEST_F(Bank_Person_Tests, Test_Person_InvalidAge_Creation)
     EXPECT_EQ(_person->getName(), "");
     EXPECT_EQ(_person->getAge(), 0);
 }
+
+TEST_F(Bank_Person_Tests, Test_Person_UniqueId)
+{
+    std::string name1 = "Person One";
+    int age1 = 40;
+    auto person1 = std::make_unique<bank::Person>(name1, age1);
+
+    std::string name2 = "Person Two";
+    int age2 = 35;
+    auto person2 = std::make_unique<bank::Person>(name2, age2);
+
+    EXPECT_NE(person1->getId(), person2->getId()); // Each person should have a unique ID
+}

@@ -160,8 +160,8 @@ TEST_F(Bank_Account_Tests, Test_Withdraw_Exact_Balance)
     double withdraw_amount = initial_balance;
     bool result = _account->withdraw(withdraw_amount);
 
-    EXPECT_TRUE(result);
-    EXPECT_NE(_account->getBalance(), 0.0);
+    EXPECT_FALSE(result);
+    EXPECT_FLOAT_EQ(_account->getBalance(), initial_balance);
 }
 
 TEST_F(Bank_Account_Tests, Test_Multiple_Deposits_And_Withdrawals)

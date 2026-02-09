@@ -8,6 +8,9 @@
  *
  *////////////////////////////////////////////////////////////////////////////
 
+ #include <string>
+ 
+ #include <interfaces/IAccountManager.h>
  #include <interfaces/IPerson.h>
 
 namespace bank

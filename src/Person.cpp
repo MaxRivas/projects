@@ -6,6 +6,7 @@
  */
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <AccountManager.h>
 #include <Constants.h>
 #include <Person.h>
 #include <Utilities.h>
@@ -40,5 +41,5 @@ namespace bank {
     int Person::getId() const
     {
         return id;
-    }   
+    }
 } // namespace bank
