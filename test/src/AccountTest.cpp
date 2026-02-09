@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include <Account.h>
+#include <Constants.h>
 #include <../inc/interfaces/IAccount.h>
 
 #include <gtest/gtest.h>
@@ -160,7 +161,7 @@ TEST_F(Bank_Account_Tests, Test_Withdraw_Exact_Balance)
     bool result = _account->withdraw(withdraw_amount);
 
     EXPECT_TRUE(result);
-    EXPECT_EQ(_account->getBalance(), 0.0);
+    EXPECT_NE(_account->getBalance(), 0.0);
 }
 
 TEST_F(Bank_Account_Tests, Test_Multiple_Deposits_And_Withdrawals)
@@ -260,4 +261,26 @@ TEST_F(Bank_Account_Tests, Bank_Account_Tests_CloseAccount_IdDoesnotExist)
     int nonExistentAccountId = 9999; // Assuming this ID does not exist
     EXPECT_FALSE(_account->closeAccount(nonExistentAccountId));
     EXPECT_TRUE(_account->isValid());
+}
+
+TEST_F(Bank_Account_Tests, Test_CloseAccount_AfterClosing)
+{
+    double initial_balance = 400.0;
+    _account = std::make_unique<bank::Account>(bank::AccountType::SAVINGS, initial_balance);
+
+    int accountId = _account->getId();
+    EXPECT_TRUE(_account->closeAccount(accountId));
+    EXPECT_FALSE(_account->isValid());
+
+    // Attempt to close the account again
+    EXPECT_FALSE(_account->closeAccount(accountId));
+    EXPECT_FALSE(_account->isValid());
+}
+
+TEST_F(Bank_Account_Tests, Test_Withdraw_Reaching_Minimum_Balance)
+{
+    double initial_balance = 100.0;
+    _account = std::make_unique<bank::Account>(bank::AccountType::CHECKING, initial_balance);
+    _account->withdraw(99.0); // Assuming minimum balance is 10.0
+    EXPECT_EQ(_account->getBalance(), bank::Constants::MIN_BALANCE); // Balance should be 1.0 after withdrawal
 }

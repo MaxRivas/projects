@@ -51,7 +51,7 @@ namespace bank {
     bool Account::withdraw(double amount)
     {
         bool result = false;
-        if (amount > Constants::MIN_BALANCE && amount <= _balance) {
+        if (amount > Constants::MIN_BALANCE && (_balance - amount) >= Constants::MIN_BALANCE) {
             _balance -= amount;
             result = true;
         }
@@ -83,7 +83,7 @@ namespace bank {
     void Account::invalidateMembers()
     {
         _accountType = bank::AccountType::INVALID;
-        _balance = Constants::MIN_BALANCE;
+        _balance = bank::Constants::INVALID_BALANCE;
         id = Constants::INVALID_ID;
     }
 }
