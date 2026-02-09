@@ -10,14 +10,19 @@
 
  #include <interfaces/IAccountManager.h>
  #include <interfaces/IPerson.h>
+ #include <RelationshipTier.h>
 
 namespace bank
 {
-    class ICustomer
+    class ICustomer : public bank::IPerson
     {
+        private:
+            bank::RelationshipTier _tier;
+            std::unique_ptr<bank::IAccountManager> _manager;
+            
         public:
-            virtual const bank::IPerson* getPerson() const = 0;
             virtual const bank::IAccountManager* getAccountManager() const = 0;
+            virtual const bank::RelationshipTier getTier() const = 0;
     };
 }
 

@@ -7,17 +7,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <Customer.h>
+#include <interfaces/IAccountManager.h>
 
-namespace bank
-{
-    const bank::IPerson* Customer::getPerson() const
+namespace bank{
+
+    Customer::Customer(const bank::RelationshipTier &tier)
     {
-        return _person.get();
+        _tier = tier;
     }
-
     const bank::IAccountManager* Customer::getAccountManager() const
     {
         return _accountManager.get();
     }
-    
+
+    const bank::RelationshipTier Customer::getTier() const
+    {
+        return _tier;
+    }
 } // namespace bank

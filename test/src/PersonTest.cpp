@@ -17,20 +17,8 @@ using bank::Person;
 
 class Bank_Person_Tests : public Test
 {
-protected:
-    void SetUp() override
-    {
-        // Code here will be called immediately after the constructor (right
-        // before each test).
-    }
-
-    void TearDown() override
-    {
-        // Code here will be called immediately after each test (right
-        // before the destructor).
-    }
-
-    std::unique_ptr<bank::IPerson> _person;
+    protected:
+        std::unique_ptr<bank::IPerson> _person;
 };
 
 TEST_F(Bank_Person_Tests, Test_Person_Creation)

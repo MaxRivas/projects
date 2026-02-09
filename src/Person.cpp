@@ -12,7 +12,7 @@
 #include <Utilities.h>
 
 namespace bank {
-    Person::Person(const std::string &name, int age)
+    Person::Person(const std::string &name, const int& age)
     {
         if ( age > 0 && bank::Utilities::isValidName(name))
         {

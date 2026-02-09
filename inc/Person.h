@@ -23,7 +23,7 @@ namespace bank
             std::string _name;
 
         public:
-            Person(const std::string &name, int age);
+            Person(const std::string &name, const int& age);
             std::string getName() const override;
             int getAge() const override;
             int getId() const override;
