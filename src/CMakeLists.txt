@@ -2,8 +2,8 @@
 file(GLOB LIBRARY_SOURCES "*.cpp")
 list(REMOVE_ITEM LIBRARY_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# Library outputs will inherit the centralized directories from the top-level
+# CMake file; avoid overriding them here to keep a single output location.
 
 add_library(banklib STATIC ${LIBRARY_SOURCES})
 target_include_directories(banklib PUBLIC ${PROJECT_SOURCE_DIR}/inc)
