@@ -17,7 +17,7 @@ enable_testing()
 ## Auto-discover test source files across the project. Use a recursive glob to
 ## pick up any newly created test source that follows a test naming pattern.
 file(GLOB_RECURSE UNIT_TEST_SOURCES CONFIGURE_DEPENDS
-    "${PROJECT_SOURCE_DIR}/*Test.cpp"
+    "${PROJECT_SOURCE_DIR}/**/*Test.cpp"
 )
 
 # Ensure the test runner main is included (it's not a *Test.cpp file).

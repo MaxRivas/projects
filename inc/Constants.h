@@ -19,7 +19,7 @@ namespace bank {
         constexpr static char WHITESPACE_CHAR = ' ';
         constexpr static char DASH_CHAR = '-';
         constexpr static char APOSTROPHE_CHAR = '\'';
-        constexpr static int INVALID_AGE = 0;
+        constexpr static int INVALID_ZERO = 0;
         static constexpr std::string_view EMPTY_STRING = "";
     };
     

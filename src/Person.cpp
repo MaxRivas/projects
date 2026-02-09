@@ -23,7 +23,7 @@ namespace bank {
         {
             id = Constants::INVALID_ID;
             _name = Constants::EMPTY_STRING;
-            _age = Constants::INVALID_AGE;
+            _age = Constants::INVALID_ZERO;
         }
     }
 

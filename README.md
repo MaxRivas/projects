@@ -81,11 +81,20 @@ ctest --verbose
 ./test/bank_test
 ```
 
-### Run specific test
+### After adding new TEST_F cases to any test file, always do a clean rebuild
+rm -rf build
+cmake -B build -S .
+cmake --build build --target bank_test
+
+
+or 
+### Run specific test Or use the VSCode task:
 
 ```bash
-./test/bank_test --gtest_filter="TestSuiteName.TestName"
+./build/bin/bank_test --gtest_filter=YourTestFixtureName*
 ```
+
+build-tests
 
 ## Code Coverage
 

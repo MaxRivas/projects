@@ -21,14 +21,16 @@ namespace bank {
     {
         private:
             std::vector<std::shared_ptr<IAccount>> _accounts;
-            bool validateInputs(const AccountType &sourceAccount, const AccountType &targetAccount, const double &amount) const;
+            bool validateInputs(const int& sourceAccount, const int& targetAccount, const double &amount) const;
+            std::vector<std::shared_ptr<IAccount>>::const_iterator getAccountById(int accountId) const;
+            bool isAmountValid(const double &amount) const;
 
         public:
             virtual bool addAccount(std::unique_ptr<IAccount> account) override;
             virtual bool removeAccount(int accountId) override;
             virtual const std::vector<std::shared_ptr<const IAccount>> getAccounts() const override;
-            virtual bool transferFunds(const AccountType &sourceAccount, const AccountType &targetAccount, const double &amount) override;
-            //virtual bool billPayment(const int& accountId, const double& amount)override;
+            virtual bool transferFunds(const int& sourceAccount, const int& targetAccount, const double &amount) override;
+            virtual bool billPayment(const int& accountId, const double& amount)override;
             //virtual bool cardPurchase(const int &accountId, const double &amount) override;
             virtual ~AccountManager() = default;
     };
