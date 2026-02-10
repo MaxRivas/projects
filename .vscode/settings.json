@@ -14,6 +14,13 @@
 
     // Ensures Test Explorer integrates with CTest
     "cmake.testPreset": "default",
+    "testExplorer.useNativeTesting": true, 
+    "testMate.cpp.test.executables": [
+         "${workspaceFolder}/build/bin/*_test", 
+         "${workspaceFolder}/build/bin/*Tests", 
+         "${workspaceFolder}/build/bin/*Test",
+         "${workspaceFolder}/build/bin/bank_test" 
+    ]
 
     // Ensures CMake Tools registers tests with VS Code Test Explorer
     "cmake.ctestArgs": [
