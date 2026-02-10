@@ -106,56 +106,62 @@ namespace bank {
     
     bank::ParserResult Utilities::parseUserInput(int flags, char* arguments[])
     {
+        constexpr int ONE = 1;
         bank::ParserResult result;
         result.status = bank::ParseStatus::Ok;
+        
+        ArgumentMap map;
 
-        constexpr int ONE = 1;
-        bank::Options options;
-
-        for (int counter = ONE; counter < argc; ++counter)
+        for (int counter = ONE; counter < flags; ++counter)
         {
-            std::string arg = argv[counter];
+            int isInRange = counter + ONE < flags;
+            std::string arg = arguments[counter];
 
-            if (arg == "--help" || arg == "-h")
+            if (arg == bank::stringViewer(Constants::HELP_FLAG))
             {
                 printHelp();
                 result.status = ParseStatus::HelpRequested;
-                return result;
             }
-            if (arg == "--exit")
+            else if (arg == bank::stringViewer(Constants::EXIT_FLAG))
             {
                 result.status = bank::ParseStatus::ExitRequested;
-                return result;
             }
-
-            if (arg == "--name" && counter + ONE < argc)
+            else if (arg == bank::stringViewer(Constants::NAME_FLAG) && isInRange)
             {
-                options.name = argv[++counter];
+                map[Constants::NAME_KEY] = std::string(arguments[++counter]);
             }
-            else if (arg == "--age" && counter + ONE < argc)
+            else if (arg == bank::stringViewer(Constants::AGE_FLAG) && isInRange)
             {
-                options.age = std::stoi(argv[++counter]);
+                map[Constants::AGE_KEY] = std::stoi(arguments[++counter]);
             }
-            else if (arg == "--relationship" && counter + 1 < argc)
+            else if (arg == bank::stringViewer(Constants::RELATIONSHIP_FLAG) && isInRange)
             {
-                int value = std::stoi(argv[++counter]);
-                options.tier = bank::Utilities::toRelationshipTier(value);
-                if (options.tier == bank::RelationshipTier::INVALID)
+                int value = std::stoi(arguments[++counter]);
+                auto relationship = bank::Utilities::toRelationshipTier(value);
+                if (relationship == bank::RelationshipTier::INVALID)
                 {
                     result.status = ParseStatus::InvalidArguments;
                     result.error = "Invalid relationship tier";
-                    return result;
+                }
+                else
+                {
+                    map[Constants::RELATIONSHIP_KEY] = relationship;
+                    result.status = ParseStatus::Ok;
                 }
             }
-            else if (arg == "--account" && counter + 1 < argc)
+            else if (arg == bank::stringViewer(Constants::ACCOUNT_FLAG) && isInRange)
             {
-                int value = std::stoi(argv[++counter]);
-                options.type = bank::Utilities::toAccountType(value);
-                if (options.type == bank::AccountType::INVALID)
+                int value = std::stoi(arguments[++counter]);
+                auto account = bank::Utilities::toAccountType(value);
+                if ( account == bank::AccountType::INVALID)
                 {
                     result.status = ParseStatus::InvalidArguments;
                     result.error = "Invalid account type";
-                    return result;
+                }
+                else
+                {
+                    map[Constants::ACCOUNT_KEY] = account;
+                    result.status = ParseStatus::Ok;
                 }
             }
             else
@@ -166,25 +172,23 @@ namespace bank {
             }
         }
 
-        result.options = options;
+        result.arguments = map;
         return result;
     }
 
     void Utilities::printHelp()
     {
         std::cout << "Supported arguments:\n"
-                  << " --help, -h Show this help message\n"
+                  << " --help Show this help message\n"
                   << " --exit Exit immediately\n"
                   << " --name <string> Customer name\n"
                   << " --age <int> Customer age\n"
                   << " --relationship <int> Relationship tier:\n"
-                  << " 1 = Bronze\n"
-                  << " 2 = Silver\n"
-                  << " 3 = Gold\n"
-                  << " 4 = Platinum\n"
+                  << " 1 = Platinum\n"
+                  << " 2 = Gold\n"
+                  << " 3 = Silver\n"
                   << " --account <int> Account type:\n"
                   << " 1 = Checking\n"
-                  << " 2 = Savings\n"
-                  << " 3 = Credit\n";
+                  << " 2 = Savings\n";
     }
 }

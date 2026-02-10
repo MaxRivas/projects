@@ -14,15 +14,10 @@
 
 #include <string.h>
 #include <iostream>
+#include <variant>
+#include <unordered_map>
 
 namespace bank {
-
-    struct Options {
-        std::string name;
-        int age = 0;
-        RelationshipTier tier = RelationshipTier::INVALID;
-        AccountType type = AccountType::INVALID;
-    };
 
     enum class ParseStatus
     {
@@ -32,11 +27,15 @@ namespace bank {
         InvalidArguments
     };
 
+    using Argument = std::variant<std::string, int, bank::RelationshipTier, bank::AccountType>;
+    using ArgumentMap = std::unordered_map<std::string, Argument>;
+
     struct ParserResult
     {
         ParseStatus status;
-        Options options;   // only valid when status == Ok
         std::string error; // only used when status == InvalidArguments
+        ArgumentMap arguments;
+
     };
 }
 

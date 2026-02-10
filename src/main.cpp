@@ -8,13 +8,14 @@
 #include <iostream>
 
 #include <Parser.h>
-
-#include <iostream>
-#include "Parser.h"
+#include <Utilities.h>
 
 int main(int argc, char *argv[])
 {
     bank::ParserResult result;
+
+    std::cout << "Welcome to the Bank application. \n";
+    std::cout << "Type --help to view support functionality\n";
 
     do
     {
