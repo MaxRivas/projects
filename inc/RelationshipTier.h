@@ -11,11 +11,12 @@
 
 namespace bank
 {
-    enum RelationshipTier
+    enum class RelationshipTier
     {
-        PLATINUM,
-        GOLD,
-        SILVER
+        PLATINUM = 1,
+        GOLD = 2,
+        SILVER = 3,
+        INVALID = -1
     };
 }
 

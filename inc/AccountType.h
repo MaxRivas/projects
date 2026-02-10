@@ -10,10 +10,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace bank {
-    enum AccountType {
-        CHECKING,
-        SAVINGS,
-        INVALID
+    enum class AccountType {
+        CHECKING = 1,
+        SAVINGS = 2,
+        INVALID = -1
     };
 }
 
