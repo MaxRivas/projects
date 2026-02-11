@@ -8,8 +8,6 @@ FetchContent_Declare(googletest
 )
 FetchContent_MakeAvailable(googletest)
 
-enable_testing()
-
 # Automatically collect all test source files
 file(GLOB_RECURSE UNIT_TEST_SOURCES CONFIGURE_DEPENDS
     "${PROJECT_SOURCE_DIR}/**/*Test.cpp"

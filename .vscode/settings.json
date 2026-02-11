@@ -1,29 +1,19 @@
 {
-    "cmake.buildDirectory": "${workspaceFolder}/build",
-    "cmake.sourceDirectory": "${workspaceFolder}",
-    "cmake.configureOnOpen": true,
+	"cmake.buildDirectory": "${workspaceFolder}/build",
+	"cmake.sourceDirectory": "${workspaceFolder}",
+	"cmake.configureOnOpen": true,
+	"cmake.generator": "Unix Makefiles",
 
-    // Optional: CMake Tools will auto-select the best generator
-    "cmake.generator": "Unix Makefiles",
+	"C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+	"C_Cpp.codeAnalysis.runAutomatically": true,
+	"testExplorer.useNativeTesting": false,
+	"testMate.cpp.test.gtest.additionalArgs": ["--gtest_color=no"],
+	"testMate.cpp.test.executables": [
+		"${workspaceFolder}/build/bin/*_test",
+		"${workspaceFolder}/build/bin/*Tests",
+		"${workspaceFolder}/build/bin/*Test",
+		"${workspaceFolder}/build/bin/bank_test"
+	],
 
-    // Required for IntelliSense to match CMake's configuration
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
-
-    // Optional but helpful
-    "C_Cpp.codeAnalysis.runAutomatically": true,
-
-    // Ensures Test Explorer integrates with CTest
-    "cmake.testPreset": "default",
-    "testExplorer.useNativeTesting": true, 
-    "testMate.cpp.test.executables": [
-         "${workspaceFolder}/build/bin/*_test", 
-         "${workspaceFolder}/build/bin/*Tests", 
-         "${workspaceFolder}/build/bin/*Test",
-         "${workspaceFolder}/build/bin/bank_test" 
-    ]
-
-    // Ensures CMake Tools registers tests with VS Code Test Explorer
-    "cmake.ctestArgs": [
-        "--output-on-failure"
-    ]
+	"cmake.ctestArgs": ["--output-on-failure"]
 }
